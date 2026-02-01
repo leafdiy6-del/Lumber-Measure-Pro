@@ -386,6 +386,7 @@
         function selectHistory(t,v){document.getElementById('g_'+t).value=v;globalInfo[t]=v;document.getElementById('historyPop').style.display='none';save();}
         function delHistory(t,i){histories[t].splice(i,1);localStorage.setItem(HIST_KEY,JSON.stringify(histories));showHistory(t);}
     </script>
+       <script>
 if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('sw.js');
       }
