@@ -1,0 +1,15 @@
+{
+  "name": "木材测量数字化系统",
+  "short_name": "木材测量",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#1a1a1a",
+  "theme_color": "#1a1a1a",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/1155/1155254.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
