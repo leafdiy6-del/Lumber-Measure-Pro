@@ -2,9 +2,9 @@
 <html lang="zh-CN">
 <head>
     <link rel="manifest" href="manifest.json">
-  <meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>橡木大师 V15.0</title>
+    <title>橡木大师 V14.0</title>
     <style>
         :root {
             --bg-color: #121212;
@@ -17,7 +17,38 @@
             --danger-color: #ff5252;
         }
 
-        /* --- 正常模式样式 (屏幕显示) --- */
+        /* --- 打印/PDF 模式样式 --- */
+        body.print-mode { background: white !important; color: black !important; padding: 10px !important; }
+        body.print-mode .header, body.print-mode .global-section, body.print-mode .log-card, 
+        body.print-mode .footer, body.print-mode .btn-del-mini, body.print-mode .btn-add-inline, 
+        body.print-mode .btn-exit-print { display: none !important; }
+        
+        .print-header-table { display: none; width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        body.print-mode .print-header-table { display: table !important; }
+        .print-header-table td { border: 1px solid #000; padding: 5px; color: #000; }
+
+        body.print-mode .list-header { 
+            background: #eee !important; color: black !important; border: 1px solid #000; position: static !important;
+            grid-template-columns: 2fr 0.8fr 0.8fr 0.8fr 1.2fr 2fr !important;
+        }
+        body.print-mode .log-row { 
+            background: transparent !important; color: black !important; border: 1px solid #000; border-top: none;
+            grid-template-columns: 2fr 0.8fr 0.8fr 0.8fr 1.2fr 2fr !important; 
+        }
+        /* 打印时让输入框和下拉框看起来像普通文字 */
+        body.print-mode input, body.print-mode select { 
+            color: black !important; background: transparent !important; border: none !important; 
+            text-align: center; width: 100%; font-weight: normal; appearance: none; -webkit-appearance: none;
+        }
+        body.print-mode .col-vol { color: black !important; }
+        
+        .print-summary-box { display: none; margin-top: 20px; border: 2px solid #000; padding: 10px; }
+        body.print-mode .print-summary-box { display: block !important; }
+        
+        .btn-exit-print { display: none; width: 100%; background: #333; color: #fff; padding: 15px; margin-bottom: 20px; border: none; border-radius: 8px; font-size: 16px; }
+        body.print-mode .btn-exit-print { display: block !important; }
+
+        /* --- 正常模式 --- */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; padding: 0; padding-bottom: 100px; background-color: var(--bg-color); color: var(--text-main); font-family: -apple-system, sans-serif; font-size: 14px; }
 
@@ -55,7 +86,13 @@
 
         .log-row { display: grid; grid-template-columns: 2fr 0.8fr 1fr 1fr 1.5fr 1.5fr 0.8fr; gap: 4px; padding: 6px 10px; background: var(--card-bg); border-bottom: 1px solid #2a2a2a; align-items: center; }
         .log-row input { height: 34px; font-size: 13px; border: none; background: transparent; text-align: center; }
-        .log-row select { height: 34px; font-size: 13px; border: none; background: transparent; text-align: center; color: #fff; font-weight: bold; appearance: none; -webkit-appearance: none; }
+        
+        /* 修复：下方列表的等级改为 Select，允许修改 */
+        .log-row select { 
+            height: 34px; font-size: 13px; border: none; background: transparent; text-align: center; 
+            color: #fff; font-weight: bold; appearance: none; -webkit-appearance: none;
+        }
+        
         .log-row input:first-child, .log-row input:nth-child(6) { text-align: left; }
         .col-vol { color: var(--accent-color); font-weight: bold; font-family: monospace; text-align: center; font-size: 12px; }
         .btn-del-mini { color: var(--danger-color); background: none; border: none; font-size: 18px; }
@@ -69,64 +106,6 @@
         .history-content { background: #222; border-radius: 8px; max-height: 80vh; overflow-y: auto; }
         .history-item { padding: 15px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; }
         .export-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 2000; padding: 20px; flex-direction: column; }
-
-        /* --- 预览/白纸模式样式 --- */
-        body.print-mode { 
-            background: white !important; 
-            color: black !important; 
-            padding: 0 !important; /* 清除默认padding */
-            margin: 0 !important;
-        }
-        
-        /* 隐藏APP元素 */
-        body.print-mode .header, body.print-mode .global-section, body.print-mode .log-card, 
-        body.print-mode .footer, body.print-mode .btn-del-mini, body.print-mode .btn-add-inline { 
-            display: none !important; 
-        }
-
-        /* 打印专用元素显示 */
-        .print-header-table { display: none; width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        body.print-mode .print-header-table { display: table !important; }
-        .print-header-table td { border: 1px solid #000; padding: 5px; color: #000; }
-
-        body.print-mode .list-header { 
-            background: #eee !important; color: black !important; border: 1px solid #000; position: static !important;
-            grid-template-columns: 2fr 0.8fr 0.8fr 0.8fr 1.2fr 2fr !important;
-        }
-        body.print-mode .log-row { 
-            background: transparent !important; color: black !important; border: 1px solid #000; border-top: none;
-            grid-template-columns: 2fr 0.8fr 0.8fr 0.8fr 1.2fr 2fr !important; 
-        }
-        body.print-mode input, body.print-mode select { 
-            color: black !important; background: transparent !important; border: none !important; 
-            text-align: center; width: 100%; font-weight: normal; appearance: none;
-        }
-        body.print-mode .col-vol { color: black !important; }
-        
-        .print-summary-box { display: none; margin-top: 20px; border: 2px solid #000; padding: 10px; }
-        body.print-mode .print-summary-box { display: block !important; }
-        
-        .btn-exit-print { display: none; width: 100%; background: #333; color: #fff; padding: 15px; margin-bottom: 20px; border: none; border-radius: 8px; font-size: 16px; }
-        body.print-mode .btn-exit-print { display: block !important; }
-
-        /* --- 核心：真正打印时的样式 (生成PDF时生效) --- */
-        @media print {
-            /* 1. 强力去除浏览器页眉页脚 (URL/日期) */
-            @page { margin: 0; size: auto; }
-            
-            /* 2. 给内容加白边 (因为去除了页边距) */
-            body.print-mode { 
-                padding: 1.5cm !important; 
-                margin: 0 !important;
-                -webkit-print-color-adjust: exact;
-            }
-
-            /* 3. 绝对隐藏退出按钮 */
-            .btn-exit-print { display: none !important; }
-            
-            /* 确保其他元素依然隐藏 */
-            .header, .footer, .fab { display: none !important; }
-        }
     </style>
 </head>
 <body>
@@ -183,8 +162,8 @@
         let logs = [];
         let globalInfo = { container: '', seller: '', measurer: '', location: '' };
         let histories = { seller: [], measurer: [], location: [] };
-        const STORAGE_KEY = 'oak_v15_data';
-        const HIST_KEY = 'oak_v15_hist';
+        const STORAGE_KEY = 'oak_v14_data';
+        const HIST_KEY = 'oak_v14_hist';
         const GRADES = ['A+', 'A', 'B', 'C', 'D', 'E'];
 
         window.onload = () => {
@@ -269,6 +248,7 @@
         }
 
         function createRow(log) {
+            // 生成等级下拉框的选项
             let gradeOptions = GRADES.map(g => `<option value="${g}" ${log.grade===g?'selected':''}>${g}</option>`).join('');
 
             const div = document.createElement('div');
@@ -276,7 +256,11 @@
             div.id = 'row-' + log.id;
             div.innerHTML = `
                 <input type="text" value="${log.code}" oninput="updateItem(${log.id},'code',this.value)">
-                <select onchange="updateItem(${log.id},'grade',this.value)">${gradeOptions}</select>
+                
+                <select onchange="updateItem(${log.id},'grade',this.value)">
+                    ${gradeOptions}
+                </select>
+
                 <input type="text" inputmode="decimal" value="${log.length}" oninput="updateItem(${log.id},'length',this.value)">
                 <input type="text" inputmode="decimal" value="${log.diameter}" oninput="updateItem(${log.id},'diameter',this.value)">
                 <div class="col-vol" id="v-row-${log.id}">${log.volume.toFixed(3)}</div>
@@ -350,9 +334,11 @@
                 document.getElementById('p_location').innerText = globalInfo.location;
                 body.classList.add('print-mode');
 
+                // 核心提示：教用户如何保存 PDF
                 setTimeout(() => {
-                    // 这里不需要弹窗问怎么保存了，直接唤起打印，因为用户已经知道了
-                    try { window.print(); } catch(e){}
+                    if(confirm("【重要提示】如何保存为 PDF？\n\n程序将调用系统打印机。\n请在出现的预览页上，用双指【放大】预览图，即可变成 PDF 文件并保存。")) {
+                        try { window.print(); } catch(e){}
+                    }
                 }, 300);
             }
         }
@@ -398,12 +384,11 @@
         function saveToHistory(t){const v=document.getElementById('g_'+t).value.trim();if(v&&!histories[t].includes(v)){histories[t].push(v);localStorage.setItem(HIST_KEY,JSON.stringify(histories));alert('已保存');}}
         function showHistory(t){const l=document.getElementById('historyList');l.innerHTML='';histories[t].forEach((i,x)=>{const d=document.createElement('div');d.className='history-item';d.innerHTML=`<div onclick="selectHistory('${t}','${i}')" style="flex:1">${i}</div><div onclick="delHistory('${t}',${x})" style="color:red;padding:0 10px">×</div>`;l.appendChild(d);});document.getElementById('historyPop').style.display='block';}
         function selectHistory(t,v){document.getElementById('g_'+t).value=v;globalInfo[t]=v;document.getElementById('historyPop').style.display='none';save();}
-        function delHistory(t,i){histories[t].splice(i,1);localStorage.setItem(HIST_KEY,JSON.stringify(histories));showHistory(t);}ories[t].splice(i,1);localStorage.setItem(HIST_KEY,JSON.stringify(histories));showHistory(t);}
+        function delHistory(t,i){histories[t].splice(i,1);localStorage.setItem(HIST_KEY,JSON.stringify(histories));showHistory(t);}
     </script>
-    <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js');
-  }
-</script>
-</body>
+if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js');
+      }
+    </script>
+  </body>
 </html>
