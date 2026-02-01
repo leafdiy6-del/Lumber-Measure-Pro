@@ -1,4 +1,4 @@
-const cacheName = 'lumber-v2'; 
+const cacheName = 'lumber-v3'; 
 const assets = ['./', './index.html', './manifest.json'];
 
 self.addEventListener('install', e => {
