@@ -1,41 +1,39 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <link rel="manifest" href="manifest.json">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>橡木大师 V16.0</title>
+    <title>Oak Master V19.0</title>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <style>
         :root {
             --bg-color: #121212;
             --card-bg: #1e1e1e;
             --text-main: #e0e0e0;
-            --accent-color: #d4a373; /* 琥珀木色 */
-            --active-text: #000;
+            --accent-color: #d4a373; 
+            --highlight-border: #ffd700;
             --input-bg: #2a2a2a;
             --border-color: #333;
             --danger-color: #ff5252;
         }
 
-        /* --- 打印/PDF 模式 --- */
+        /* --- 打印模式 --- */
         body.print-mode { background: white !important; color: black !important; padding: 0 !important; margin: 0 !important; }
         body.print-mode .header, body.print-mode .global-section, body.print-mode .log-card, 
         body.print-mode .footer, body.print-mode .btn-del-mini, body.print-mode .btn-add-inline, 
-        body.print-mode .btn-exit-print { display: none !important; }
+        body.print-mode .btn-exit-print, body.print-mode .scan-btn, body.print-mode .scan-modal-overlay { display: none !important; }
         
-        /* 打印专用头部表格 */
         .print-header-table { display: none; width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 12px; }
         body.print-mode .print-header-table { display: table !important; }
         .print-header-table td { border: 1px solid #000; padding: 5px; color: #000; }
 
-        /* 打印列表 */
         body.print-mode .list-header { 
             background: #eee !important; color: black !important; border: 1px solid #000; position: static !important;
-            grid-template-columns: 2fr 0.8fr 0.8fr 0.8fr 1.2fr 2fr !important;
+            grid-template-columns: 0.5fr 2fr 0.8fr 0.8fr 0.8fr 1.2fr 2fr !important;
         }
         body.print-mode .log-row { 
             background: transparent !important; color: black !important; border: 1px solid #000; border-top: none;
-            grid-template-columns: 2fr 0.8fr 0.8fr 0.8fr 1.2fr 2fr !important; 
+            grid-template-columns: 0.5fr 2fr 0.8fr 0.8fr 0.8fr 1.2fr 2fr !important; opacity: 1 !important;
         }
         body.print-mode input, body.print-mode select { 
             color: black !important; background: transparent !important; border: none !important; 
@@ -47,7 +45,6 @@
         .btn-exit-print { display: none; width: 100%; background: #333; color: #fff; padding: 15px; margin-bottom: 20px; border: none; border-radius: 8px; font-size: 16px; }
         body.print-mode .btn-exit-print { display: block !important; }
 
-        /* 强力去页眉页脚 */
         @media print {
             @page { margin: 0; size: auto; }
             body.print-mode { padding: 1.5cm !important; }
@@ -56,33 +53,41 @@
 
         /* --- 正常模式 --- */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; padding: 0; padding-bottom: 110px; background-color: var(--bg-color); color: var(--text-main); font-family: -apple-system, sans-serif; font-size: 14px; }
+        body { margin: 0; padding: 0; padding-bottom: 120px; background-color: var(--bg-color); color: var(--text-main); font-family: -apple-system, sans-serif; font-size: 14px; transition: all 0.3s; }
 
         .header { position: fixed; top: 0; left: 0; right: 0; height: 50px; background: #1a1a1a; display: flex; justify-content: space-between; align-items: center; padding: 0 10px; z-index: 100; border-bottom: 1px solid var(--border-color); }
-        .btn-header { padding: 6px 10px; border-radius: 4px; border: none; font-weight: bold; font-size: 11px; }
+        .btn-header { padding: 6px 10px; border-radius: 4px; border: none; font-weight: bold; font-size: 11px; cursor: pointer; }
         .btn-info { background: #444; color: #fff; display: flex; align-items: center; gap: 4px; border: 1px solid #555; }
         .btn-export { background: var(--accent-color); color: #000; margin-left: 5px; }
         .btn-pdf { background: #555; color: #fff; margin-left: 5px; }
         .btn-reset { background: transparent; color: var(--danger-color); border: 1px solid var(--danger-color); }
 
-        /* 全局信息区 - 极简模式 */
         .global-section { margin-top: 60px; padding: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .input-box { display: flex; flex-direction: column; }
         .input-box label { font-size: 11px; color: #888; margin-bottom: 2px; }
         input, select { background: var(--input-bg); border: 1px solid var(--border-color); color: #fff; height: 38px; border-radius: 4px; padding: 0 8px; font-size: 14px; width: 100%; }
 
-        .list-header { display: grid; grid-template-columns: 2fr 0.8fr 1fr 1fr 1.5fr 1.5fr 0.8fr; padding: 10px; background: #252525; margin-top: 10px; font-size: 11px; color: #888; position: sticky; top: 50px; z-index: 90; }
+        .list-header { display: grid; grid-template-columns: 0.5fr 2fr 0.8fr 1fr 1fr 1.5fr 1.5fr 0.8fr; padding: 10px; background: #252525; margin-top: 10px; font-size: 11px; color: #888; position: sticky; top: 50px; z-index: 90; }
 
         .log-card { background: var(--card-bg); margin: 10px; border-radius: 8px; padding: 15px; border: 2px solid var(--accent-color); box-shadow: 0 4px 15px rgba(212,163,115,0.2); }
         .card-title { font-size: 10px; color: var(--accent-color); text-transform: uppercase; font-weight: bold; margin-bottom: 8px; }
         .card-row-1 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .card-row-2 { display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 10px; margin-bottom: 15px; align-items: end; }
-        .field { display: flex; flex-direction: column; gap: 4px; }
+        .field { display: flex; flex-direction: column; gap: 4px; position: relative; }
         .field label { font-size: 11px; color: #888; }
         .field input { height: 44px; font-size: 18px; border-color: var(--accent-color); font-weight: bold; }
         .input-note { font-size: 14px !important; font-weight: normal !important; color: #bbb !important; }
         .live-vol-display { height: 44px; background: rgba(0,0,0,0.3); border-radius: 4px; display: flex; align-items: center; justify-content: center; color: var(--accent-color); font-size: 20px; font-weight: bold; font-family: monospace; border: 1px solid #333; }
         
+        /* 扫码按钮 - 条码图标 */
+        .scan-btn { 
+            position: absolute; right: 5px; top: 22px; height: 36px; width: 44px; 
+            border: none; background: transparent; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center; z-index: 10; 
+        }
+        /* 简单的条码SVG图标 */
+        .scan-icon { width: 24px; height: 24px; fill: #aaa; }
+
         .grade-label { font-size: 11px; color: #888; margin-bottom: 5px; }
         .grade-container { display: flex; justify-content: space-between; gap: 5px; margin-bottom: 15px; }
         .btn-grade { flex: 1; height: 40px; background: #333; border: 1px solid #444; color: #888; border-radius: 6px; font-weight: bold; font-size: 14px; padding: 0; }
@@ -90,60 +95,62 @@
         .btn-add-inline { width: 100%; height: 50px; background: var(--accent-color); color: #000; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
         .btn-add-inline:active { transform: scale(0.98); }
 
-        .log-row { display: grid; grid-template-columns: 2fr 0.8fr 1fr 1fr 1.5fr 1.5fr 0.8fr; gap: 4px; padding: 6px 10px; background: var(--card-bg); border-bottom: 1px solid #2a2a2a; align-items: center; }
+        .log-row { display: grid; grid-template-columns: 0.5fr 2fr 0.8fr 1fr 1fr 1.5fr 1.5fr 0.8fr; gap: 4px; padding: 6px 10px; background: var(--card-bg); border-bottom: 1px solid #2a2a2a; align-items: center; transition: opacity 0.3s; }
+        .log-row.dimmed { opacity: 0.2; } 
+        .log-row.highlighted { border: 1px solid var(--highlight-border); background-color: #333; }
         .log-row input { height: 34px; font-size: 13px; border: none; background: transparent; text-align: center; }
         .log-row select { height: 34px; font-size: 13px; border: none; background: transparent; text-align: center; color: #fff; font-weight: bold; appearance: none; -webkit-appearance: none; }
-        .log-row input:first-child, .log-row input:nth-child(6) { text-align: left; }
+        .row-index { color: #666; font-size: 12px; text-align: center; }
+        .log-row input:nth-child(2), .log-row input:nth-child(7) { text-align: left; }
         .col-vol { color: var(--accent-color); font-weight: bold; font-family: monospace; text-align: center; font-size: 12px; }
         .btn-del-mini { color: var(--danger-color); background: none; border: none; font-size: 18px; }
 
-        .footer { position: fixed; bottom: 0; left: 0; right: 0; background: #1a1a1a; border-top: 1px solid #333; padding-bottom: env(safe-area-inset-bottom); }
+        .footer { position: fixed; bottom: 0; left: 0; right: 0; background: #1a1a1a; border-top: 1px solid #333; padding-bottom: env(safe-area-inset-bottom); z-index: 110; }
         .stats-detail { display: flex; overflow-x: auto; padding: 8px; gap: 8px; font-size: 11px; border-bottom: 1px solid #222; }
-        .stat-tag { background: #2a2a2a; padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
+        .stat-tag { background: #2a2a2a; padding: 4px 10px; border-radius: 12px; white-space: nowrap; cursor: pointer; border: 1px solid transparent; user-select: none; }
+        .stat-tag.active-filter { border-color: var(--accent-color); background: #444; color: #fff; }
         .stats-main { display: flex; justify-content: space-around; padding: 15px 10px; font-weight: bold; align-items: baseline; }
-        /* 1. 字体加大 */
         .stats-main span { font-size: 14px; color: #aaa; }
         .stats-main span strong { font-size: 24px; color: var(--accent-color); margin-left: 5px; }
 
-        /* --- 弹窗样式 --- */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 2000; padding: 20px; flex-direction: column; justify-content: center; }
-        .modal-card { background: #222; padding: 20px; border-radius: 10px; border: 1px solid #444; }
-        .modal-title { font-size: 18px; font-weight: bold; color: var(--accent-color); margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
-        
+        .modal-card { background: #222; padding: 20px; border-radius: 10px; border: 1px solid #444; max-height: 90vh; overflow-y: auto; }
+        .modal-title { font-size: 18px; font-weight: bold; color: var(--accent-color); margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
         .info-row { margin-bottom: 15px; }
         .info-row label { display: block; color: #888; font-size: 12px; margin-bottom: 5px; }
         .info-controls { display: flex; gap: 5px; }
         .btn-tool { background: #333; border: 1px solid #444; color: #ccc; width: 40px; height: 38px; border-radius: 4px; border: none; flex-shrink: 0; }
-
         .export-text { flex: 1; background: #111; color: #fff; border: 1px solid #444; padding: 10px; font-size: 12px; margin-bottom: 10px; }
         .btn-block { width: 100%; height: 45px; border-radius: 6px; border: none; font-weight: bold; font-size: 16px; margin-top: 10px; cursor: pointer; }
+
+        #reader { width: 100%; height: 300px; background: #000; }
     </style>
 </head>
 <body>
 
-    <button class="btn-exit-print" onclick="togglePrintMode()">⬅ 返回编辑模式</button>
+    <button class="btn-exit-print" onclick="togglePrintMode()">⬅ <span data-i18n="back_edit">返回编辑模式</span></button>
 
     <table class="print-header-table">
-        <tr><td width="15%">日期:</td><td width="35%" id="p_date"></td><td width="15%">集装箱:</td><td width="35%" id="p_container"></td></tr>
-        <tr><td>卖方:</td><td id="p_seller"></td><td>地点:</td><td id="p_location"></td></tr>
-        <tr><td>测量人:</td><td id="p_measurer" colspan="3"></td></tr>
-        <tr><td>备注:</td><td id="p_note" colspan="3"></td></tr>
+        <tr><td width="15%"><span data-i18n="p_date">日期</span>:</td><td width="35%" id="p_date"></td><td width="15%"><span data-i18n="container">集装箱</span>:</td><td width="35%" id="p_container"></td></tr>
+        <tr id="print_row_seller"><td><span data-i18n="seller">卖方</span>:</td><td id="p_seller"></td><td><span data-i18n="location">地点</span>:</td><td id="p_location"></td></tr>
+        <tr><td><span data-i18n="measurer">测量人</span>:</td><td id="p_measurer" colspan="3"></td></tr>
+        <tr id="print_row_note"><td><span data-i18n="note_global">备注</span>:</td><td id="p_note" colspan="3"></td></tr>
     </table>
 
     <header class="header">
         <div style="display: flex; gap: 10px;">
-            <button class="btn-header btn-reset" onclick="resetLogOnly()">⟳ 新柜</button>
-            <button class="btn-header btn-info" onclick="openInfoModal()">📋 项目信息</button>
+            <button class="btn-header btn-reset" onclick="resetLogOnly()" data-i18n="btn_new">⟳ 新柜</button>
+            <button class="btn-header btn-info" onclick="openInfoModal()" data-i18n="btn_info">📋 信息</button>
         </div>
         <div style="display: flex;">
-            <button class="btn-header btn-pdf" onclick="togglePrintMode()">PDF</button>
-            <button class="btn-header btn-export" onclick="exportData()">EXCEL</button>
+            <button class="btn-header btn-pdf" onclick="togglePrintMode()" data-i18n="btn_pdf">PDF</button>
+            <button class="btn-header btn-export" onclick="exportData()" data-i18n="btn_excel">EXCEL</button>
         </div>
     </header>
 
     <div class="global-section">
-        <div class="input-box"><label>集装箱号</label><input type="text" id="g_container" oninput="updateGlobal()"></div>
-        <div class="input-box"><label>整单备注 (Global Note)</label><input type="text" id="g_note" oninput="updateGlobal()"></div>
+        <div class="input-box"><label data-i18n="container">集装箱号</label><input type="text" id="g_container" oninput="updateGlobal()"></div>
+        <div class="input-box"><label data-i18n="note_global">整单备注</label><input type="text" id="g_note" oninput="updateGlobal()"></div>
     </div>
 
     <div id="logList"></div>
@@ -152,56 +159,99 @@
     <div class="footer">
         <div class="stats-detail" id="statsDetail"></div>
         <div class="stats-main">
-            <span>总数:<strong id="totalCount">0</strong></span>
-            <span>材积:<strong id="totalVol">0.000</strong> m³</span>
+            <span><span data-i18n="total_count">总数</span>:<strong id="totalCount">0</strong></span>
+            <span><span data-i18n="total_vol">材积</span>:<strong id="totalVol">0.000</strong> m³</span>
         </div>
     </div>
 
     <div id="infoModal" class="modal-overlay">
         <div class="modal-card">
-            <div class="modal-title">📋 填写项目信息</div>
-            
+            <div class="modal-title">
+                <span data-i18n="modal_info_title">项目信息</span>
+                <select id="langSelect" onchange="changeLanguage(this.value)" style="width:100px; height:30px; font-size:12px;">
+                    <option value="zh">中文</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
             <div class="info-row">
-                <label>卖方公司 (Seller)</label>
+                <label data-i18n="my_company">我方公司</label>
+                <div class="info-controls"><input type="text" id="g_company" oninput="updateGlobal()"><button class="btn-tool" onclick="saveToHistory('company')">💾</button><button class="btn-tool" onclick="showHistory('company')">📖</button></div>
+            </div>
+            <div class="info-row">
+                <label data-i18n="seller">卖方公司</label>
                 <div class="info-controls"><input type="text" id="g_seller" oninput="updateGlobal()"><button class="btn-tool" onclick="saveToHistory('seller')">💾</button><button class="btn-tool" onclick="showHistory('seller')">📖</button></div>
             </div>
             <div class="info-row">
-                <label>测量人 (Measurer)</label>
+                <label data-i18n="measurer">测量人</label>
                 <div class="info-controls"><input type="text" id="g_measurer" oninput="updateGlobal()"><button class="btn-tool" onclick="saveToHistory('measurer')">💾</button><button class="btn-tool" onclick="showHistory('measurer')">📖</button></div>
             </div>
             <div class="info-row">
-                <label>地点 (Location)</label>
+                <label data-i18n="location">地点</label>
                 <div class="info-controls"><input type="text" id="g_location" oninput="updateGlobal()"><button class="btn-tool" onclick="saveToHistory('location')">💾</button><button class="btn-tool" onclick="showHistory('location')">📖</button></div>
             </div>
+            <button class="btn-block" style="background:var(--accent-color); color:#000;" onclick="closeInfoModal()" data-i18n="btn_close">关闭</button>
+        </div>
+    </div>
 
-            <button class="btn-block" style="background:var(--accent-color); color:#000;" onclick="closeInfoModal()">完成 / 关闭</button>
+    <div id="scanModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-title" data-i18n="scan_barcode">扫描条码</div>
+            <div id="reader"></div>
+            <p style="color:#aaa; font-size:12px; text-align:center; margin-top:5px;">(iOS需手动允许相机权限)</p>
+            <button class="btn-block" style="background:#444; color:#fff;" onclick="stopScanner()" data-i18n="btn_cancel">取消</button>
         </div>
     </div>
 
     <div id="historyPop" class="modal-overlay" onclick="this.style.display='none'">
         <div class="modal-card" onclick="event.stopPropagation()">
-            <div class="modal-title">选择历史记录</div>
+            <div class="modal-title" data-i18n="modal_history">选择历史记录</div>
             <div id="historyList" style="max-height:300px; overflow-y:auto;"></div>
-            <button class="btn-block" style="background:#333; color:#fff;" onclick="document.getElementById('historyPop').style.display='none'">关闭</button>
+            <button class="btn-block" style="background:#333; color:#fff;" onclick="document.getElementById('historyPop').style.display='none'" data-i18n="btn_close">关闭</button>
         </div>
     </div>
 
     <div id="exportModal" class="modal-overlay">
         <div class="modal-card">
-            <div class="modal-title">Excel 数据内容</div>
+            <div class="modal-title">Excel Data</div>
             <textarea id="exportText" class="export-text" rows="10"></textarea>
-            <button class="btn-block" style="background:var(--accent-color); color:#000;" onclick="copyExportText()">复制全部</button>
-            <button class="btn-block" style="background:#444; color:#fff;" onclick="document.getElementById('exportModal').style.display='none'">关闭</button>
+            <button class="btn-block" style="background:var(--accent-color); color:#000;" onclick="copyExportText()" data-i18n="btn_copy">复制全部</button>
+            <button class="btn-block" style="background:#444; color:#fff;" onclick="document.getElementById('exportModal').style.display='none'" data-i18n="btn_close">关闭</button>
         </div>
     </div>
 
     <script>
         let logs = [];
-        let globalInfo = { container: '', note: '', seller: '', measurer: '', location: '' };
-        let histories = { seller: [], measurer: [], location: [] };
-        const STORAGE_KEY = 'oak_v16_data';
-        const HIST_KEY = 'oak_v16_hist';
-        const GRADES = ['A+', 'A', 'B', 'C', 'D', 'E'];
+        let globalInfo = { container: '', note: '', seller: '', measurer: '', location: '', company: '' };
+        let histories = { seller: [], measurer: [], location: [], company: [] };
+        const GRADES = ['F', 'A+', 'A', 'B', 'C', 'D'];
+        let activeFilter = null;
+        let currentLang = 'zh';
+        let html5QrcodeScanner = null;
+
+        const I18N = {
+            zh: {
+                btn_new: "⟳ 新柜", btn_info: "📋 信息", btn_pdf: "PDF", btn_excel: "导出",
+                container: "集装箱号", note_global: "整单备注", seller: "卖方公司", measurer: "测量人", location: "地点", my_company: "我方公司",
+                code: "码号", grade: "等级", len: "长(m)", dia: "径(cm)", vol: "体积", note: "备注", idx: "序号",
+                inputting: "● 正在输入", add_next: "+ 添加并下一根",
+                total_count: "总数", total_vol: "材积",
+                modal_info_title: "项目信息", modal_history: "历史记录", btn_close: "关闭", btn_copy: "复制", btn_cancel: "取消",
+                back_edit: "返回编辑模式", p_date: "日期", select_grade: "选择等级", scan_barcode: "扫描条码"
+            },
+            en: {
+                btn_new: "⟳ Reset", btn_info: "📋 Info", btn_pdf: "PDF", btn_excel: "Export",
+                container: "Container", note_global: "Global Note", seller: "Seller", measurer: "Measurer", location: "Location", my_company: "My Company",
+                code: "Code", grade: "Grade", len: "L(m)", dia: "D(cm)", vol: "Vol", note: "Note", idx: "#",
+                inputting: "● Inputting", add_next: "+ Add & Next",
+                total_count: "Count", total_vol: "Volume",
+                modal_info_title: "Project Info", modal_history: "History", btn_close: "Close", btn_copy: "Copy All", btn_cancel: "Cancel",
+                back_edit: "Back to Edit", p_date: "Date", select_grade: "Select Grade", scan_barcode: "Scan Barcode"
+            }
+        };
+
+        const STORAGE_KEY = 'oak_v19_data';
+        const HIST_KEY = 'oak_v19_hist';
+        const LANG_KEY = 'oak_v19_lang';
 
         window.onload = () => {
             const savedData = localStorage.getItem(STORAGE_KEY);
@@ -209,37 +259,53 @@
                 const p = JSON.parse(savedData);
                 logs = p.logs || [];
                 globalInfo = p.global || globalInfo;
-                // 恢复数据到输入框
-                ['container', 'note', 'seller', 'measurer', 'location'].forEach(k => {
+                ['container', 'note', 'seller', 'measurer', 'location', 'company'].forEach(k => {
                     const el = document.getElementById('g_'+k);
                     if(el) el.value = globalInfo[k] || '';
                 });
             }
             const savedHist = localStorage.getItem(HIST_KEY);
             if(savedHist) histories = JSON.parse(savedHist);
+            
+            const savedLang = localStorage.getItem(LANG_KEY);
+            if(savedLang) {
+                currentLang = savedLang;
+                document.getElementById('langSelect').value = currentLang;
+            }
+            applyLanguage();
+
             if(logs.length === 0) addNewLog();
             renderAll();
         };
 
+        function changeLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem(LANG_KEY, lang);
+            applyLanguage();
+            renderAll();
+        }
+
+        function applyLanguage() {
+            const texts = I18N[currentLang];
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if(texts[key]) el.innerText = texts[key];
+            });
+            if(document.querySelector('.grade-label')) document.querySelector('.grade-label').innerText = texts.select_grade;
+        }
+
         function updateGlobal() { 
-            ['container', 'note', 'seller', 'measurer', 'location'].forEach(k => {
+            ['container', 'note', 'seller', 'measurer', 'location', 'company'].forEach(k => {
                 globalInfo[k] = document.getElementById('g_'+k).value;
             });
             save(); 
         }
         function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify({ logs, global: globalInfo })); updateStats(); }
-        
-        // 2. 自动逗号转点：输入 3,5 -> 3.5
-        function cleanInput(val) { 
-            if(!val) return '';
-            return val.replace(/,/g, '.').replace(/[^0-9.]/g, ''); 
-        }
-        // 当输入框失去焦点时，或者计算时，自动修正显示的值
+        function cleanInput(val) { if(!val) return ''; return val.replace(/,/g, '.').replace(/[^0-9.]/g, ''); }
         function autoFixInput(input) {
             let val = input.value;
             if(val.includes(',')) {
                 input.value = val.replace(/,/g, '.');
-                // 触发一次 update
                 const id = input.getAttribute('data-id');
                 const field = input.getAttribute('data-field');
                 if(id && field) updateItem(parseInt(id), field, input.value);
@@ -253,13 +319,13 @@
         }
 
         function addNewLog() {
-            // 添加前先把所有逗号修一下
             document.querySelectorAll('input').forEach(i => autoFixInput(i));
-
-            const newLog = { id: Date.now(), code: getNextCode(), grade: 'A', length: '', diameter: '', volume: 0, note: '' };
+            const newLog = { id: Date.now(), code: getNextCode(), grade: 'F', length: '', diameter: '', volume: 0, note: '' };
             logs.unshift(newLog);
             save();
             renderAll();
+            activeFilter = null;
+            applyFilter();
             setTimeout(() => {
                 const firstCard = document.querySelector('.log-card');
                 if(firstCard) firstCard.querySelector('.in-l').focus();
@@ -269,20 +335,25 @@
         function renderAll() {
             const container = document.getElementById('logList');
             container.innerHTML = '';
+            const t = I18N[currentLang];
+            
             if(logs.length > 1) {
                 const header = document.createElement('div');
                 header.className = 'list-header';
-                header.innerHTML = '<div>码号</div><div>等级</div><div>L(m)</div><div>D(cm)</div><div>体积</div><div>备注</div><div></div>';
+                header.innerHTML = `<div>${t.idx}</div><div>${t.code}</div><div>${t.grade}</div><div>${t.len}</div><div>${t.dia}</div><div>${t.vol}</div><div>${t.note}</div><div></div>`;
                 container.appendChild(header);
             }
             logs.forEach((log, index) => {
-                if(index === 0) container.insertBefore(createCard(log), container.firstChild);
-                else container.appendChild(createRow(log));
+                const realIndex = logs.length - index;
+                if(index === 0) container.insertBefore(createCard(log, realIndex), container.firstChild);
+                else container.appendChild(createRow(log, realIndex));
             });
             updateStats();
+            applyFilter();
         }
 
-        function createCard(log) {
+        function createCard(log, idx) {
+            const t = I18N[currentLang];
             let btnsHtml = '';
             GRADES.forEach(g => {
                 const isActive = log.grade === g ? 'active' : '';
@@ -292,48 +363,49 @@
             const div = document.createElement('div');
             div.className = 'log-card';
             div.innerHTML = `
-                <div class="card-title">● 正在输入 (NO. ${logs.length})</div>
+                <div class="card-title">${t.inputting} (NO. ${idx})</div>
                 <div class="card-row-1">
-                    <div class="field"><label>码号</label><input type="text" value="${log.code}" oninput="updateItem(${log.id},'code',this.value)"></div>
-                    <div class="field"><label>备注 (Note)</label><input type="text" class="input-note" value="${log.note || ''}" placeholder="" oninput="updateItem(${log.id},'note',this.value)"></div>
+                    <div class="field">
+                        <label>${t.code}</label>
+                        <input type="text" id="curr_code_${log.id}" value="${log.code}" oninput="updateItem(${log.id},'code',this.value)">
+                        <button class="scan-btn" onclick="startScanner(${log.id})">
+                            <svg viewBox="0 0 24 24" class="scan-icon"><path d="M4 6h2v12H4zm3 0h1v12H7zm2 0h3v12H9zm4 0h1v12h-1zm2 0h2v12h-2zm3 0h2v12h-2z"/></svg>
+                        </button>
+                    </div>
+                    <div class="field"><label>${t.note}</label><input type="text" class="input-note" value="${log.note || ''}" oninput="updateItem(${log.id},'note',this.value)"></div>
                 </div>
                 <div class="card-row-2">
-                    <div class="field">
-                        <label>长度 (m)</label>
-                        <input type="text" inputmode="decimal" class="in-l" value="${log.length}" 
-                               data-id="${log.id}" data-field="length"
-                               oninput="updateItem(${log.id},'length',this.value)"
-                               onblur="autoFixInput(this)">
-                    </div>
-                    <div class="field">
-                        <label>直径 (cm)</label>
-                        <input type="text" inputmode="decimal" value="${log.diameter}" 
-                               data-id="${log.id}" data-field="diameter"
-                               oninput="updateItem(${log.id},'diameter',this.value)"
-                               onblur="autoFixInput(this)">
-                    </div>
+                    <div class="field"><label>${t.len}</label><input type="text" inputmode="decimal" class="in-l" value="${log.length}" data-id="${log.id}" data-field="length" oninput="updateItem(${log.id},'length',this.value)" onblur="autoFixInput(this)"></div>
+                    <div class="field"><label>${t.dia}</label><input type="text" inputmode="decimal" value="${log.diameter}" data-id="${log.id}" data-field="diameter" oninput="updateItem(${log.id},'diameter',this.value)" onblur="autoFixInput(this)"></div>
                     <div class="live-vol-display" id="v-${log.id}">${log.volume.toFixed(3)} m³</div>
                 </div>
-                <div class="grade-label">选择等级 (Grade)</div>
+                <div class="grade-label">${t.select_grade}</div>
                 <div class="grade-container">${btnsHtml}</div>
-                <button class="btn-add-inline" onclick="addNewLog()">+ 添加并下一根 (Next)</button>
+                <button class="btn-add-inline" onclick="addNewLog()">${t.add_next}</button>
             `;
             return div;
         }
 
-        function createRow(log) {
+        function createRow(log, idx) {
             let gradeOptions = GRADES.map(g => `<option value="${g}" ${log.grade===g?'selected':''}>${g}</option>`).join('');
-
             const div = document.createElement('div');
             div.className = 'log-row';
             div.id = 'row-' + log.id;
+            div.setAttribute('data-grade', log.grade);
+            
+            const len_m = parseFloat(cleanInput(log.length.toString()));
+            const d_cm = parseFloat(cleanInput(log.diameter.toString()));
+            div.setAttribute('data-len', len_m || 0);
+            div.setAttribute('data-dia', d_cm || 0);
+
             div.innerHTML = `
+                <div class="row-index">${idx}</div>
                 <input type="text" value="${log.code}" oninput="updateItem(${log.id},'code',this.value)">
                 <select onchange="updateItem(${log.id},'grade',this.value)">${gradeOptions}</select>
                 <input type="text" inputmode="decimal" value="${log.length}" oninput="updateItem(${log.id},'length',this.value)" onblur="autoFixInput(this)">
                 <input type="text" inputmode="decimal" value="${log.diameter}" oninput="updateItem(${log.id},'diameter',this.value)" onblur="autoFixInput(this)">
                 <div class="col-vol" id="v-row-${log.id}">${log.volume.toFixed(3)}</div>
-                <input type="text" style="font-size:12px;color:#aaa;text-align:left;" value="${log.note||''}" placeholder="..." oninput="updateItem(${log.id},'note',this.value)">
+                <input type="text" style="font-size:12px;color:#aaa;text-align:left;" value="${log.note||''}" oninput="updateItem(${log.id},'note',this.value)">
                 <button class="btn-del-mini" onclick="delItem(${log.id})">×</button>
             `;
             return div;
@@ -344,18 +416,12 @@
         function updateItem(id, field, val) {
             const item = logs.find(l => l.id === id);
             item[field] = val;
-            
             if(field === 'length' || field === 'diameter') {
-                // 核心修复：把逗号转成点，确保计算正确
                 let l_str = item.length.toString().replace(/,/g, '.');
                 let d_str = item.diameter.toString().replace(/,/g, '.');
-                
                 const l = parseFloat(l_str);
                 const d = parseFloat(d_str);
-                
                 if (!isNaN(l) && !isNaN(d) && l > 0 && d > 0) {
-                    // 2. 长度单位回归：直接用米计算
-                    // V = pi * (D/200)^2 * L(m)
                     const radius_m = d / 200;
                     item.volume = parseFloat((Math.PI * Math.pow(radius_m, 2) * l).toFixed(3));
                 } else {
@@ -365,10 +431,11 @@
                 const vRowDisplay = document.getElementById('v-row-'+id); if(vRowDisplay) vRowDisplay.innerText = item.volume.toFixed(3);
             }
             save();
+            if(activeFilter) applyFilter();
         }
 
-        function delItem(id) { if(confirm('删除记录?')) { logs = logs.filter(l => l.id !== id); renderAll(); save(); } }
-        function resetLogOnly() { if(confirm('开始新柜记录？\n(头部信息保留)')) { logs = []; save(); location.reload(); } }
+        function delItem(id) { if(confirm('Delete?')) { logs = logs.filter(l => l.id !== id); renderAll(); save(); } }
+        function resetLogOnly() { if(confirm('New Container? (Keep Header Info)')) { logs = []; save(); location.reload(); } }
 
         function updateStats() {
             const validLogs = logs.filter(l => parseFloat(l.volume) > 0);
@@ -376,30 +443,114 @@
             document.getElementById('totalCount').innerText = validLogs.length;
             document.getElementById('totalVol').innerText = totalV.toFixed(3);
             
-            const gStats = {}; let l4 = 0, l25 = 0;
+            const gStats = {}; 
+            let l4 = 0, l25 = 0, d30 = 0;
             validLogs.forEach(l => {
                 gStats[l.grade] = (gStats[l.grade] || 0) + 1;
-                // 长度直接用米判断
-                const len_m = parseFloat(l.length.replace(/,/g, '.'));
+                const len_m = parseFloat(cleanInput(l.length.toString()));
+                const d_cm = parseFloat(cleanInput(l.diameter.toString()));
                 if(len_m < 4.0) l4++;
                 if(len_m < 2.5) l25++;
+                if(d_cm < 30) d30++;
             });
 
             let html = '';
-            for(let g in gStats) html += `<div class="stat-tag">${g}: <b style="color:var(--accent-color)">${gStats[g]}</b></div>`;
-            html += `<div class="stat-tag"> < 4m: <b>${l4}</b></div>`;
-            html += `<div class="stat-tag"> < 2.5m: <b>${l25}</b></div>`;
+            const mkTag = (key, label, count) => {
+                if(count === 0) return '';
+                const isActive = activeFilter === key ? 'active-filter' : '';
+                return `<div class="stat-tag ${isActive}" onclick="toggleFilter('${key}')">${label}: <b>${count}</b></div>`;
+            };
+            for(let g in gStats) html += mkTag('g_'+g, g, gStats[g]);
+            html += mkTag('l4', '< 4m', l4);
+            html += mkTag('l25', '< 2.5m', l25);
+            html += mkTag('d30', '< 30cm', d30);
             document.getElementById('statsDetail').innerHTML = html;
 
-            let summaryHtml = `<h3>统计汇总</h3><p>总根数: ${validLogs.length} &nbsp;&nbsp;&nbsp; 总材积: ${totalV.toFixed(3)} m³</p><p>等级: `;
-            for(let g in gStats) summaryHtml += `${g}: ${gStats[g]};  `;
+            let summaryHtml = `<h3>${currentLang==='zh'?'统计汇总':'Summary'}</h3>
+            <p>${I18N[currentLang].total_count}: ${validLogs.length} &nbsp; ${I18N[currentLang].total_vol}: ${totalV.toFixed(3)} m³</p>
+            <p>Grade: `;
+            for(let g in gStats) summaryHtml += `${g}: ${gStats[g]}; `;
             summaryHtml += `</p>`;
             document.getElementById('printSummary').innerHTML = summaryHtml;
         }
 
-        // --- 弹窗逻辑 ---
+        function toggleFilter(key) {
+            if(activeFilter === key) activeFilter = null;
+            else activeFilter = key;
+            updateStats();
+            applyFilter();
+        }
+
+        function applyFilter() {
+            const rows = document.querySelectorAll('.log-row');
+            if(!activeFilter) {
+                rows.forEach(r => { r.classList.remove('dimmed', 'highlighted'); });
+                return;
+            }
+            rows.forEach(r => {
+                let match = false;
+                const g = r.getAttribute('data-grade');
+                const l = parseFloat(r.getAttribute('data-len'));
+                const d = parseFloat(r.getAttribute('data-dia'));
+                if(activeFilter.startsWith('g_') && activeFilter === 'g_' + g) match = true;
+                else if(activeFilter === 'l4' && l < 4.0) match = true;
+                else if(activeFilter === 'l25' && l < 2.5) match = true;
+                else if(activeFilter === 'd30' && d < 30) match = true;
+                if(match) { r.classList.add('highlighted'); r.classList.remove('dimmed'); } 
+                else { r.classList.add('dimmed'); r.classList.remove('highlighted'); }
+            });
+        }
+
         function openInfoModal() { document.getElementById('infoModal').style.display = 'flex'; }
         function closeInfoModal() { document.getElementById('infoModal').style.display = 'none'; updateGlobal(); }
+
+        // --- 核心修复：低功耗扫码 ---
+        let currentScanLogId = null;
+        function startScanner(logId) {
+            currentScanLogId = logId;
+            document.getElementById('scanModal').style.display = 'flex';
+            
+            // 安全清理旧实例
+            if (html5QrcodeScanner) {
+                html5QrcodeScanner.clear().catch(e => console.log(e));
+            }
+            html5QrcodeScanner = new Html5Qrcode("reader");
+            
+            const config = { 
+                fps: 2, // 关键修复：降低到2帧/秒，防止过热卡死
+                qrbox: 250,
+                aspectRatio: 1.0
+            };
+            
+            html5QrcodeScanner.start({ facingMode: "environment" }, config, onScanSuccess)
+            .catch(err => {
+                alert("无法启动摄像头。请检查是否在 HTTPS 环境或已允许权限。\n" + err);
+                stopScanner();
+            });
+        }
+
+        function onScanSuccess(decodedText, decodedResult) {
+            if(currentScanLogId) {
+                updateItem(currentScanLogId, 'code', decodedText);
+                const input = document.getElementById('curr_code_' + currentScanLogId);
+                if(input) input.value = decodedText;
+                if(navigator.vibrate) navigator.vibrate(100);
+                stopScanner();
+            }
+        }
+
+        function stopScanner() {
+            if(html5QrcodeScanner) {
+                html5QrcodeScanner.stop().then(() => {
+                    html5QrcodeScanner.clear();
+                    document.getElementById('scanModal').style.display = 'none';
+                }).catch(err => {
+                    document.getElementById('scanModal').style.display = 'none';
+                });
+            } else {
+                document.getElementById('scanModal').style.display = 'none';
+            }
+        }
 
         function togglePrintMode() {
             const body = document.body;
@@ -413,56 +564,69 @@
                 document.getElementById('p_seller').innerText = globalInfo.seller;
                 document.getElementById('p_measurer').innerText = globalInfo.measurer;
                 document.getElementById('p_location').innerText = globalInfo.location;
+                document.getElementById('print_row_seller').style.display = (!globalInfo.seller && !globalInfo.location) ? 'none' : 'table-row';
+                document.getElementById('print_row_note').style.display = (!globalInfo.note) ? 'none' : 'table-row';
                 body.classList.add('print-mode');
                 setTimeout(() => { try { window.print(); } catch(e){} }, 300);
             }
         }
 
         async function exportData() {
-            const d = new Date(); const ds = d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
-            let csv = `\ufeff日期,${ds}\n集装箱号,${globalInfo.container}\n整单备注,${globalInfo.note}\n卖方公司,${globalInfo.seller}\n测量人,${globalInfo.measurer}\n地点,${globalInfo.location}\n\n码号,等级,长度(m),直径(cm),体积(m3),备注\n`;
+            const d = new Date(); 
+            // 修复：文件名带时间
+            const timeStr = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}_${d.getHours()}-${d.getMinutes()}-${d.getSeconds()}`;
+            const ds = d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+            const t = I18N[currentLang];
+            
+            let header = `\ufeff${t.p_date},${ds}\n`;
+            if(globalInfo.company) header += `${t.my_company},${globalInfo.company}\n`;
+            if(globalInfo.container) header += `${t.container},${globalInfo.container}\n`;
+            if(globalInfo.note) header += `${t.note_global},${globalInfo.note}\n`;
+            if(globalInfo.seller) header += `${t.seller},${globalInfo.seller}\n`;
+            if(globalInfo.measurer) header += `${t.measurer},${globalInfo.measurer}\n`;
+            if(globalInfo.location) header += `${t.location},${globalInfo.location}\n`;
+            
+            let csv = header + `\n${t.idx},${t.code},${t.grade},${t.len},${t.dia},${t.vol},${t.note}\n`;
             
             const validLogs = logs.filter(l => parseFloat(l.volume) > 0);
-
-            [...validLogs].reverse().forEach(l => { 
-                // 确保长度是点格式，避免csv错乱
+            [...validLogs].reverse().forEach((l, idx) => { 
                 let len = l.length.replace(/,/g, '.');
                 let dia = l.diameter.replace(/,/g, '.');
-                csv += `${l.code},${l.grade},${len},${dia},${l.volume.toFixed(3)},${l.note||''}\n`; 
+                csv += `${idx+1},${l.code},${l.grade},${len},${dia},${l.volume.toFixed(3)},${l.note||''}\n`; 
             });
             
             const totalV = validLogs.reduce((s, l) => s + l.volume, 0);
-
-            let l4 = 0, l25 = 0;
+            let l4 = 0, l25 = 0, d30 = 0;
             validLogs.forEach(l => {
                 const len_m = parseFloat(l.length.replace(/,/g, '.'));
+                const dia_cm = parseFloat(l.diameter.replace(/,/g, '.'));
                 if(len_m < 4.0) l4++;
                 if(len_m < 2.5) l25++;
+                if(dia_cm < 30) d30++;
             });
 
-            csv += `\n=== 统计 ===\n总根数,${validLogs.length}\n总材积,${totalV.toFixed(3)}\n`;
-            csv += `4米以下数量,${l4}\n`;
-            csv += `2.5米以下数量,${l25}\n`;
-            csv += `\n=== 等级 ===\n`;
+            csv += `\n\n=== ${currentLang==='zh'?'统计':'Summary'} ===\n`;
+            csv += `${t.total_count},${validLogs.length}\n${t.total_vol},${totalV.toFixed(3)}\n`;
+            csv += `\n< 4m,${l4}\n< 2.5m,${l25}\n< 30cm,${d30}\n\n`;
+            csv += `=== ${t.grade} ===\n`;
             const gStats = {}; validLogs.forEach(l => { gStats[l.grade] = (gStats[l.grade] || 0) + 1; });
             for(let g in gStats) csv += `${g},${gStats[g]}\n`;
 
+            const fileName = `Oak_${timeStr}.csv`;
+
             if (navigator.share) {
-                try {
-                    await navigator.share({ files: [new File([csv], `橡木_${globalInfo.container||'Data'}.csv`, {type: 'text/csv'})], title: 'Export' });
-                    return;
-                } catch (e) {}
+                try { await navigator.share({ files: [new File([csv], fileName, {type: 'text/csv'})], title: 'Export' }); return; } catch (e) {}
             }
             document.getElementById('exportText').value = csv;
             document.getElementById('exportModal').style.display = 'flex';
         }
-        function copyExportText() { document.getElementById('exportText').select(); document.execCommand('copy'); alert('已复制'); document.getElementById('exportModal').style.display='none'; }
+        function copyExportText() { document.getElementById('exportText').select(); document.execCommand('copy'); alert('Copied'); document.getElementById('exportModal').style.display='none'; }
         
-        function saveToHistory(t){const v=document.getElementById('g_'+t).value.trim();if(v&&!histories[t].includes(v)){histories[t].push(v);localStorage.setItem(HIST_KEY,JSON.stringify(histories));alert('已保存');}}
+        function saveToHistory(t){const v=document.getElementById('g_'+t).value.trim();if(v&&!histories[t].includes(v)){histories[t].push(v);localStorage.setItem(HIST_KEY,JSON.stringify(histories));alert('Saved');}}
         function showHistory(t){
             const l=document.getElementById('historyList');l.innerHTML='';
             const items = histories[t] || [];
-            if(items.length===0) l.innerHTML='<div style="padding:10px;color:#666;">暂无记录</div>';
+            if(items.length===0) l.innerHTML='<div style="padding:10px;color:#666;">No Record</div>';
             items.forEach((i,x)=>{
                 const d=document.createElement('div');
                 d.style.cssText='padding:12px;border-bottom:1px solid #333;display:flex;justify-content:space-between;align-items:center;';
@@ -474,10 +638,5 @@
         function selectHistory(t,v){document.getElementById('g_'+t).value=v;globalInfo[t]=v;document.getElementById('historyPop').style.display='none';save();}
         function delHistory(t,i){histories[t].splice(i,1);localStorage.setItem(HIST_KEY,JSON.stringify(histories));showHistory(t);}
     </script>
-       <script>
-if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js');
-      }
-    </script>
-  </body>
+</body>
 </html>
