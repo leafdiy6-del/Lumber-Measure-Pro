@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
     <link rel="apple-touch-icon" href="icon.png">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Oak Master Gold V28.1</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Oak Master Gold V28.6</title>
 <style>
     :root {
         --bg-color: #121212;
@@ -18,38 +18,45 @@
         --active-mode: #4caf50;
     }
 
-    /* --- 打印返回图标 --- */
-    .print-back-icon {
-        display: none; 
-        position: fixed; bottom: 40px; right: 30px;
-        width: 68px; height: 68px;
-        cursor: pointer; z-index: 9999;
-        filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
-        transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 50%;
+    /* --- 顶部标题栏 (PDF预览模式专用) --- */
+    .print-top-bar {
+        display: none; /* 默认隐藏 */
+        width: 100%;
+        background-color: #ffffff; /* 白底 */
+        color: #000000;            /* 黑字 */
+        text-align: center;
+        padding: 12px 0;           
+        font-size: 16px;           /* 精致小字号 */
+        font-weight: 800;          
+        text-transform: uppercase;
+        cursor: pointer;
+        /* [V28.6] 已删除 border-bottom，去掉黑线 */
+        margin-bottom: 15px;
+        letter-spacing: 0.5px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
-    .print-back-icon:active { transform: scale(0.9); }
-    .print-back-icon svg { width: 100%; height: 100%; }
+    .print-top-bar:active { opacity: 0.7; background-color: #f0f0f0; }
 
     /* --- 打印/预览模式逻辑 --- */
     @media print {
-        .print-back-icon { display: none !important; }
+        .print-top-bar { display: none !important; }
         @page { margin: 0; size: auto; }
         body.print-mode { padding: 1.5cm !important; margin: 0 !important; }
         .header, .log-card, .footer, .btn-del-mini, .modal-overlay, .btn-add-inline, .grade-section { display: none !important; }
     }
 
+    /* 手机预览模式 (Preview Mode) */
     body.print-mode { background: white !important; color: black !important; padding: 0 !important; margin: 0 !important; }
     body.print-mode .header, body.print-mode .log-card, body.print-mode .footer { display: none !important; }
-    body.print-mode .print-back-icon { display: block !important; animation: popIn 0.3s ease-out; }
-    @keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    body.print-mode .print-top-bar { display: block !important; animation: fadeIn 0.3s; }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
     .print-header-table { display: none; width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 12px; }
     body.print-mode .print-header-table { display: table !important; }
     .print-header-table td { border: 1px solid #000; padding: 5px; color: #000; }
 
-    /* 打印列表：7列 (无删除键) */
+    /* 打印列表样式 */
     body.print-mode .list-header { 
         background: #eee !important; color: black !important; border: 1px solid #000; position: static !important;
         display: grid !important; grid-template-columns: 0.5fr 2fr 0.8fr 0.8fr 0.8fr 1.2fr 2fr !important;
@@ -70,7 +77,7 @@
     .print-summary-box { display: none; margin-top: 20px; border: 2px solid #000; padding: 10px; }
     body.print-mode .print-summary-box { display: block !important; }
 
-    /* --- 编辑模式 --- */
+    /* --- 编辑模式样式 --- */
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body { margin: 0; padding: 0; padding-bottom: 120px; background-color: var(--bg-color); color: var(--text-main); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 14px; transition: background-color 0.3s; }
 
@@ -87,7 +94,6 @@
     input, select { background: var(--input-bg); border: 1px solid var(--border-color); color: #fff; height: 38px; border-radius: 4px; padding: 0 8px; font-size: 14px; width: 100%; }
     input:focus, select:focus { border-color: var(--accent-color); outline: none; }
 
-    /* 表头：8列 */
     .list-header { display: grid; grid-template-columns: 0.5fr 2fr 0.8fr 1fr 1fr 1.5fr 1.5fr 0.8fr; padding: 10px; background: #252525; 
                    font-size: 11px; color: #888; position: sticky; top: 50px; z-index: 90; border-bottom: 1px solid #333; }
 
@@ -102,15 +108,33 @@
     .input-note { font-size: 14px !important; font-weight: normal !important; color: #bbb !important; }
     .live-vol-display { height: 44px; background: rgba(0,0,0,0.3); border-radius: 4px; display: flex; align-items: center; justify-content: center; color: var(--accent-color); font-size: 20px; font-weight: bold; font-family: monospace; border: 1px solid #333; }
     
-    /* 双径输入框容器 - 纯净无图标 */
     .double-input-container { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
     .double-input-container input { text-align: center; font-size: 18px; font-weight: bold; }
 
     .grade-section { display: block; }
     .grade-section.hidden { display: none; }
     .grade-label { font-size: 11px; color: #888; margin-bottom: 5px; }
-    .grade-container { display: flex; justify-content: space-between; gap: 5px; margin-bottom: 15px; }
-    .btn-grade { flex: 1; height: 42px; background: #333; border: 1px solid #444; color: #888; border-radius: 6px; font-weight: bold; font-size: 15px; padding: 0; cursor: pointer; transition: all 0.1s; }
+    
+    .grade-container { 
+        display: grid; 
+        grid-template-columns: repeat(6, 1fr); 
+        gap: 5px; 
+        margin-bottom: 15px; 
+        width: 100%;
+    }
+    .btn-grade { 
+        width: 100%; 
+        height: 42px; 
+        background: #333; 
+        border: 1px solid #444; 
+        color: #888; 
+        border-radius: 6px; 
+        font-weight: bold; 
+        font-size: 15px; 
+        padding: 0; 
+        cursor: pointer; 
+        transition: all 0.1s; 
+    }
     .btn-grade:active { transform: scale(0.95); }
     .btn-grade.active { background: var(--accent-color); color: #000; border-color: var(--accent-color); box-shadow: 0 0 10px rgba(212,163,115,0.4); }
 
@@ -167,21 +191,8 @@
 </head>
 <body>
 
-<div class="print-back-icon" onclick="togglePrintMode()" title="Back">
-    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-            <radialGradient id="goldGrad" cx="50%" cy="50%" r="50%" fx="30%" fy="30%">
-                <stop offset="0%" style="stop-color:#ffe082; stop-opacity:1" />
-                <stop offset="100%" style="stop-color:#d4a373; stop-opacity:1" />
-            </radialGradient>
-        </defs>
-        <circle cx="50" cy="50" r="48" fill="#5D4037" stroke="#3E2723" stroke-width="2"/>
-        <circle cx="50" cy="50" r="45" fill="#D7CCC8" />
-        <circle cx="50" cy="50" r="42" fill="url(#goldGrad)" />
-        <circle cx="50" cy="50" r="34" fill="none" stroke="#b08d55" stroke-width="1.5" opacity="0.6"/>
-        <circle cx="50" cy="50" r="6" fill="#8D6E63" />
-        <path d="M50 50 L75 68" stroke="#5D4037" stroke-width="1.5" opacity="0.4"/>
-    </svg>
+<div class="print-top-bar" onclick="togglePrintMode()">
+    PACKING - LOG LIST / SHIPMENT
 </div>
 
 <table class="print-header-table">
@@ -239,7 +250,6 @@
 <div id="settingsModal" class="modal-overlay">
     <div class="modal-card">
         <div class="modal-title">⚙️ <span data-i18n="settings_title">设置</span></div>
-        
         <div class="setting-group">
             <div class="setting-row">
                 <span class="setting-label" data-i18n="language">语言 / Language</span>
@@ -266,7 +276,6 @@
                 </select>
             </div>
         </div>
-
         <div class="setting-group">
             <div style="font-size:12px; color:#aaa; margin-bottom:10px;" data-i18n="deduction_desc">自动扣尺 (保存时自动扣除)</div>
             <div class="setting-row">
@@ -278,7 +287,6 @@
                 <input type="number" id="setDeductDia" class="setting-input" value="0" onchange="saveSettings()">
             </div>
         </div>
-
         <button class="btn-block" style="background:#333; color:#fff;" onclick="document.getElementById('settingsModal').style.display='none'" data-i18n="btn_close">关闭</button>
     </div>
 </div>
@@ -291,7 +299,7 @@
     let globalInfo = { container: '', note: '', seller: '', measurer: '', location: '', company: '' };
     let histories = { container: [], seller: [], measurer: [], location: [], company: [] };
     let appSettings = { deductLen: 0, deductDia: 0, showGrade: true, calcDia: false, roundMode: 'up' };
-    let nextRoundUp = true; // For mix mode tracking
+    let nextRoundUp = true;
     const GRADES = ['F', 'A+', 'A', 'B', 'C', 'D'];
     let activeFilter = null;
     let currentLang = 'zh';
@@ -303,12 +311,12 @@
         sl: { btn_new: "⟳ Nov", btn_info: "📋 Info", btn_pdf: "PDF", btn_excel: "Izvozi", container: "Kontejner", note_global: "Opomba", seller: "Prodajalec", measurer: "Merilec", location: "Lokacija", my_company: "Podjetje", code: "Št.", grade: "Razred", len: "D(m)", dia: "P(cm)", vol: "Vol", note: "Opomba", idx: "#", inputting: "● Vnos", add_next: "+ Dodaj", total_count: "Količina", total_vol: "Volumen", modal_info_title: "Podatki", modal_history: "Zgodovina", btn_close: "Zapri", btn_copy: "Kopiraj", p_date: "Datum", select_grade: "Izberi Razred", quick_on: "⚡ Hitro: ON", quick_off: "⚡ Hitro: OFF", settings_title: "Nastavitve", language: "Jezik", show_grade: "Prikaži Razrede", len_deduct: "Odbitek Dolžine", dia_deduct: "Odbitek Premera", deduction_desc: "Samodejni odbitek (cm)", calc_dia: "Dvojni premer (Povprečje)" }
     };
 
-    const STORAGE_KEY = 'oak_v281_data';
-    const HIST_KEY = 'oak_v281_hist';
-    const LANG_KEY = 'oak_v281_lang';
-    const QUICK_KEY = 'oak_v281_quick';
-    const SETTINGS_KEY = 'oak_v281_settings';
-    const MIX_STATE_KEY = 'oak_v281_mix';
+    const STORAGE_KEY = 'oak_v286_data';
+    const HIST_KEY = 'oak_v286_hist';
+    const LANG_KEY = 'oak_v286_lang';
+    const QUICK_KEY = 'oak_v286_quick';
+    const SETTINGS_KEY = 'oak_v286_settings';
+    const MIX_STATE_KEY = 'oak_v286_mix';
 
     window.onload = () => {
         const savedData = localStorage.getItem(STORAGE_KEY);
@@ -421,16 +429,13 @@
         }
     }
 
-    // 单径模式
     function handleQuickDiameterSingle(input) {
         if (!isQuickMode) return;
-        // 如果等级开启，由等级点击触发；如果关闭，由输入触发
         if (appSettings.showGrade) return;
 
         const val = input.value;
         if (!val) return;
         
-        // 1开头等待3位
         if (val.length === 2 && /^\d+$/.test(val) && !val.startsWith('1')) { saveAndJumpSingle(val); }
         if (val.length === 3 && /^\d+$/.test(val)) { saveAndJumpSingle(val); }
     }
@@ -441,11 +446,10 @@
             setTimeout(() => {
                 const lenInput = document.querySelector(`.log-card .field input[data-field="length"]`);
                 if(lenInput) lenInput.focus(); 
-            }, 0); // Immediate jump
+            }, 0);
         }, 150);
     }
 
-    // 双径 - 直径1
     function handleQuickDia1(input) {
         if (!isQuickMode) return;
         const val = input.value;
@@ -460,7 +464,6 @@
         }
     }
 
-    // 双径 - 直径2
     function handleQuickDia2(input) {
         if (!isQuickMode) return;
         const val = input.value;
@@ -471,10 +474,7 @@
         if (val.length === 3 && /^\d+$/.test(val)) isDone = true;
 
         if (isDone) {
-            // 如果等级开关开启 -> 停住
             if (appSettings.showGrade) return;
-            
-            // 如果等级关闭 -> 自动保存并跳到下一行长度
             setTimeout(() => { 
                 addNewLog();
                 setTimeout(() => {
@@ -552,7 +552,6 @@
         activeFilter = null;
         applyFilter();
         
-        // Focus Length Input (Keep keyboard up)
         setTimeout(() => {
             const lenInput = document.querySelector(`.log-card .field input[data-field="length"]`);
             if(lenInput) { lenInput.focus(); lenInput.click(); }
@@ -590,7 +589,6 @@
 
         let diaInputHtml = '';
         if (appSettings.calcDia) {
-            // 双径模式 - 使用标准的 text+decimal 模式，确保数字键盘
             diaInputHtml = `
                 <div class="double-input-container">
                     <input type="text" inputmode="decimal" id="in-dia-1" oninput="handleQuickDia1(this)">
@@ -620,12 +618,10 @@
                 </div>
                 <div class="live-vol-display" id="v-${log.id}">${log.volume.toFixed(3)}</div>
             </div>
-            
             <div class="grade-section ${gradeDisplayClass}">
                 <div class="grade-label">${t.select_grade}</div>
                 <div class="grade-container">${btnsHtml}</div>
             </div>
-            
             <button class="btn-add-inline" onclick="addNewLog()">${t.add_next}</button>
         `;
         return div;
@@ -697,7 +693,6 @@
             }
         }
         
-        // 实时双径预览
         if(appSettings.calcDia && id === logs[0].id) {
              const d1 = parseFloat(document.getElementById('in-dia-1').value) || 0;
              const d2 = parseFloat(document.getElementById('in-dia-2').value) || 0;
@@ -711,7 +706,6 @@
                  }
              }
         }
-
         save();
         if(activeFilter) applyFilter();
     }
