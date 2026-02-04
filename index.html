@@ -145,8 +145,23 @@
     .log-row:nth-child(even) { background: #222; }
     .log-row.dimmed { opacity: 0.2; }
     .log-row.highlighted { border: 1px solid var(--accent-color); background-color: #333; }
-    .log-row input, .log-row select { height: 34px; font-size: 13px; border: none; background: transparent; text-align: center; }
-    .log-row select { color: #fff; font-weight: bold; }
+    .log-row input, .log-row select { 
+    height: 34px; 
+    font-size: 13px; 
+    border: none; 
+    background: transparent; 
+    text-align: center; 
+    width: 100%; /* 确保填满格子 */
+    padding: 0;  /* 清除内边距，给文字留空间 */
+}
+/* 专门针对下拉框的 Safari 修复 */
+.log-row select { 
+    color: #fff; 
+    font-weight: bold; 
+    -webkit-appearance: none; /* 必须：强制去掉 Safari 默认的下拉箭头 */
+    appearance: none;          /* 去掉标准浏览器的默认箭头 */
+    text-align-last: center;   /* 确保 iOS Safari 选中的文字水平居中 */
+}
     .row-index { color: #666; font-size: 12px; text-align: center; }
     .log-row input:nth-child(2), .log-row input:nth-child(7) { text-align: left; }
     .col-vol { color: var(--accent-color); font-weight: bold; font-family: monospace; text-align: center; font-size: 12px; }
