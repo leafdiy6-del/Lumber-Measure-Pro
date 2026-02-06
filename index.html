@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -18,65 +19,6 @@
         --active-mode: #4caf50;
     }
 
-    /* --- 顶部标题栏 (PDF预览模式专用) --- */
-    .print-top-bar {
-        display: none; /* 默认隐藏 */
-        width: 100%;
-        background-color: #ffffff; /* 白底 */
-        color: #000000;            /* 黑字 */
-        text-align: center;
-        padding: 12px 0;           
-        font-size: 16px;           /* 精致小字号 */
-        font-weight: 800;          
-        text-transform: uppercase;
-        cursor: pointer;
-        /* [V28.6] 已删除 border-bottom，去掉黑线 */
-        margin-bottom: 15px;
-        letter-spacing: 0.5px;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-    .print-top-bar:active { opacity: 0.7; background-color: #f0f0f0; }
-
-    /* --- 打印/预览模式逻辑 --- */
-    @media print {
-        .print-top-bar { display: none !important; }
-        @page { margin: 0; size: auto; }
-        body.print-mode { padding: 1.5cm !important; margin: 0 !important; }
-        .header, .log-card, .footer, .btn-del-mini, .modal-overlay, .btn-add-inline, .grade-section { display: none !important; }
-    }
-
-    /* 手机预览模式 (Preview Mode) */
-    body.print-mode { background: white !important; color: black !important; padding: 0 !important; margin: 0 !important; }
-    body.print-mode .header, body.print-mode .log-card, body.print-mode .footer { display: none !important; }
-    body.print-mode .print-top-bar { display: block !important; animation: fadeIn 0.3s; }
-
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-    .print-header-table { display: none; width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 12px; }
-    body.print-mode .print-header-table { display: table !important; }
-    .print-header-table td { border: 1px solid #000; padding: 5px; color: #000; }
-
-    /* 打印列表样式 */
-    body.print-mode .list-header { 
-        background: #eee !important; color: black !important; border: 1px solid #000; position: static !important;
-        display: grid !important; grid-template-columns: 0.5fr 2fr 0.8fr 0.8fr 0.8fr 1.2fr 2fr !important;
-    }
-    body.print-mode .list-header div:last-child { display: none !important; }
-
-    body.print-mode .log-row { 
-        background: transparent !important; color: black !important; border: 1px solid #000; border-top: none;
-        grid-template-columns: 0.5fr 2fr 0.8fr 0.8fr 0.8fr 1.2fr 2fr !important; opacity: 1 !important;
-    }
-    body.print-mode .btn-del-mini { display: none !important; }
-
-    body.print-mode input, body.print-mode select { 
-        color: black !important; background: transparent !important; border: none !important;
-        text-align: center; width: 100%; font-weight: normal; appearance: none;
-    }
-    body.print-mode .col-vol { color: black !important; }
-    .print-summary-box { display: none; margin-top: 20px; border: 2px solid #000; padding: 10px; }
-    body.print-mode .print-summary-box { display: block !important; }
-
     /* --- 编辑模式样式 --- */
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body { margin: 0; padding: 0; padding-bottom: 120px; background-color: var(--bg-color); color: var(--text-main); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 14px; transition: background-color 0.3s; }
@@ -96,6 +38,10 @@
 
     .list-header { display: grid; grid-template-columns: 0.5fr 2fr 0.8fr 1fr 1fr 1.5fr 1.5fr 0.8fr; padding: 10px; background: #252525; 
                    font-size: 11px; color: #888; position: sticky; top: 50px; z-index: 90; border-bottom: 1px solid #333; }
+/* 紧跟在下面,添加这 5 行微调,确保标题右移 */ .list-header div:nth-child(2) { padding-left: 25px; } /* 码号标题 */ .list-header div:nth-child(3) {
+    margin-left: -15px; /* 用负数强行往左拽,数值越大拉得越猛 */
+    padding-left: 0;
+}{ padding-left: 10px; } /* 等级标题 */ .list-header div:nth-child(4) { padding-left: 3px; } /* 长度标题 */ .list-header div:nth-child(5) { padding-left: 3px; } /* 直径标题 */ .list-header div:nth-child(6) { padding-left: 25px; } /* 体积标题 */.list-header div:nth-child(7) { padding-left: 25px; } /* 备注标题 */
 
     .log-card { background: var(--card-bg); margin: 10px; border-radius: 8px; padding: 15px; border: 2px solid var(--accent-color); box-shadow: 0 4px 15px rgba(212,163,115,0.15); }
     .card-title { font-size: 10px; color: var(--accent-color); text-transform: uppercase; font-weight: bold; margin-bottom: 8px; display: flex; justify-content: space-between; }
@@ -142,6 +88,7 @@
     .btn-add-inline:active { transform: scale(0.98); background: #c59363; }
 
     .log-row { display: grid; grid-template-columns: 0.5fr 2fr 0.8fr 1fr 1fr 1.5fr 1.5fr 0.8fr; gap: 4px; padding: 8px 10px; background: var(--card-bg); border-bottom: 1px solid #2a2a2a; align-items: center; }
+.log-row input:nth-child(2) { padding-left: 10px; text-align: left; } /* 码号框 */ .log-row select:nth-child(3) { padding-left: 0px; text-align-last: left !important; } /* 等级选择 */ .log-row input:nth-child(4) { padding-left: 6px; text-align: left !important; } /* 长度框 */ .log-row input:nth-child(5) { padding-left: 20px; text-align: left !important; } /* 直径框 */
     .log-row:nth-child(even) { background: #222; }
     .log-row.dimmed { opacity: 0.2; }
     .log-row.highlighted { border: 1px solid var(--accent-color); background-color: #333; }
@@ -152,19 +99,20 @@
     background: transparent; 
     text-align: center; 
     width: 100%; /* 确保填满格子 */
-    padding: 0;  /* 清除内边距，给文字留空间 */
+    padding: 0;  /* 清除内边距,给文字留空间 */
 }
 /* 专门针对下拉框的 Safari 修复 */
 .log-row select { 
     color: #fff; 
     font-weight: bold; 
-    -webkit-appearance: none; /* 必须：强制去掉 Safari 默认的下拉箭头 */
+    -webkit-appearance: none; /* 必须:强制去掉 Safari 默认的下拉箭头 */
     appearance: none;          /* 去掉标准浏览器的默认箭头 */
     text-align-last: center;   /* 确保 iOS Safari 选中的文字水平居中 */
 }
     .row-index { color: #666; font-size: 12px; text-align: center; }
     .log-row input:nth-child(2), .log-row input:nth-child(7) { text-align: left; }
-    .col-vol { color: var(--accent-color); font-weight: bold; font-family: monospace; text-align: center; font-size: 12px; }
+    .col-vol { color: var(--accent-color); font-weight: bold; font-family: monospace; text-align: center; font-size: 12px; 
+text-align: left !important; padding-left: 25px !important; }
     
     .btn-del-mini { color: var(--danger-color); background: none; border: none; font-size: 20px; width: 100%; cursor: pointer; }
     .btn-del-mini:active { transform: scale(1.2); }
@@ -203,34 +151,25 @@
     input:checked + .slider { background-color: var(--accent-color); }
     input:checked + .slider:before { transform: translateX(16px); }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
-
-<div class="print-top-bar" onclick="togglePrintMode()">
-    PACKING - LOG LIST / SHIPMENT
-</div>
-
-<table class="print-header-table">
-    <tr id="print_row_company"><td colspan="4"><span data-i18n="my_company">公司</span>: <span id="p_company" style="font-weight:bold;"></span></td></tr>
-    <tr><td width="15%"><span data-i18n="p_date">日期</span>:</td><td width="35%" id="p_date"></td><td width="15%"><span data-i18n="container">集装箱</span>:</td><td width="35%" id="p_container"></td></tr>
-    <tr id="print_row_seller"><td><span data-i18n="seller">卖方</span>:</td><td id="p_seller"></td><td><span data-i18n="location">地点</span>:</td><td id="p_location"></td></tr>
-    <tr id="print_row_measurer"><td><span data-i18n="measurer">测量人</span>:</td><td id="p_measurer" colspan="3"></td></tr>
-    <tr id="print_row_note"><td><span data-i18n="note_global">备注</span>:</td><td id="p_note" colspan="3"></td></tr>
-</table>
 
 <header class="header">
     <div style="display: flex; gap: 10px;">
         <button class="btn-header btn-reset" onclick="resetLogOnly()" data-i18n="btn_new">⟳ 新柜</button>
         <button class="btn-header btn-info" onclick="openInfoModal()" data-i18n="btn_info">📋 信息</button>
+        <button class="btn-header btn-info" onclick="openSettingsModal()" data-i18n="btn_settings">⚙️ 设置</button>
     </div>
     <div style="display: flex;">
-        <button class="btn-header btn-pdf" onclick="togglePrintMode()" data-i18n="btn_pdf">PDF</button>
-        <button class="btn-header btn-export" onclick="exportData()" data-i18n="btn_excel">导出</button>
+        <button class="btn-header btn-pdf" onclick="generatePDF()" data-i18n="btn_pdf">PDF</button>
+        <button class="btn-header btn-export" onclick="exportData()" data-i18n="btn_excel">导出 Excel</button>
     </div>
 </header>
 
 <div id="logList"></div>
-<div class="print-summary-box" id="printSummary"></div>
 
 <div class="footer">
     <div class="stats-detail" id="statsDetail"></div>
@@ -243,11 +182,7 @@
 <div id="infoModal" class="modal-overlay">
     <div class="modal-card">
         <div class="modal-title">
-            <div style="display:flex; align-items:center;">
-                <span data-i18n="modal_info_title">项目信息</span>
-                <button id="quickModeBtn" class="toggle-btn" onclick="toggleQuickMode()">⚡</button>
-            </div>
-            <button class="btn-tool" onclick="openSettingsModal()" style="width:40px;height:30px;font-size:18px;">⚙️</button>
+            <span data-i18n="modal_info_title">项目信息</span>
         </div>
         
         <div class="info-row"><label data-i18n="container">集装箱号</label><div class="info-controls"><input type="text" id="g_container" oninput="updateGlobal()"></div></div>
@@ -273,6 +208,10 @@
                     <option value="en">English</option>
                     <option value="sl">Slovenščina</option>
                 </select>
+            </div>
+            <div class="setting-row">
+                <span class="setting-label" data-i18n="quick_mode">快速模式</span>
+                <button id="quickModeBtn" class="toggle-btn" onclick="toggleQuickMode()">⚡</button>
             </div>
             <div class="setting-row">
                 <span class="setting-label"><span data-i18n="show_grade">显示等级</span></span>
@@ -302,18 +241,107 @@
                 <input type="number" id="setDeductDia" class="setting-input" value="0" onchange="saveSettings()">
             </div>
         </div>
+        <div class="setting-group">
+            <div style="font-size:12px; color:#aaa; margin-bottom:10px;" data-i18n="price_title">价格设置 (每立方米)</div>
+            <div class="setting-row">
+                <span class="setting-label" data-i18n="price_currency">币种</span>
+                <select id="priceCurrency" onchange="updateCurrencySymbols(); saveSettings()" style="width:100px; height:30px; font-size:12px;">
+                    <option value="EUR">EUR €</option>
+                    <option value="USD">USD $</option>
+                    <option value="CNY">CNY ¥</option>
+                </select>
+            </div>
+            <div class="setting-row">
+                <span class="setting-label" data-i18n="price_mode">定价方式</span>
+                <select id="priceMode" onchange="updatePriceModeUI(); saveSettings()" style="width:120px; height:30px; font-size:12px;">
+                    <option value="fixed" data-i18n="price_mode_fixed">统一价</option>
+                    <option value="grade" data-i18n="price_mode_grade">按等级</option>
+                </select>
+            </div>
+            <div class="setting-row" id="priceFixedRow">
+                <span class="setting-label" data-i18n="price_fixed">一口价 (每立方米)</span>
+                <div style="display: flex; align-items: center; gap: 5px; width: 103px;">
+                    <input type="number" id="priceFixed" class="setting-input" value="0" onchange="saveSettings()">
+                    <span id="currencySymbolFixed" style="color: var(--accent-color); font-weight: bold; font-size: 16px; min-width: 18px;">€</span>
+                </div>
+            </div>
+            <div id="priceGradeBox" style="display:none;">
+                <div class="setting-row" style="align-items:flex-start;">
+                    <span class="setting-label" data-i18n="price_by_grade">按等级</span>
+                    <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:15px; width:100%;">
+                        <div style="display:flex; align-items:center; gap:4px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px;">
+                            <span style="min-width:24px; font-weight: bold; color: #aaa;">F</span>
+                            <input type="number" id="price_grade_F" class="setting-input" style="width:100%;" onchange="saveSettings()">
+                            <span class="currencySymbolGrade" style="color: var(--accent-color); font-weight: bold; font-size: 14px; min-width: 18px;">€</span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:4px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px;">
+                            <span style="min-width:24px; font-weight: bold; color: #aaa;">A+</span>
+                            <input type="number" id="price_grade_Aplus" class="setting-input" style="width:100%;" onchange="saveSettings()">
+                            <span class="currencySymbolGrade" style="color: var(--accent-color); font-weight: bold; font-size: 14px; min-width: 18px;">€</span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:4px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px;">
+                            <span style="min-width:24px; font-weight: bold; color: #aaa;">A</span>
+                            <input type="number" id="price_grade_A" class="setting-input" style="width:100%;" onchange="saveSettings()">
+                            <span class="currencySymbolGrade" style="color: var(--accent-color); font-weight: bold; font-size: 14px; min-width: 18px;">€</span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:4px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px;">
+                            <span style="min-width:24px; font-weight: bold; color: #aaa;">B</span>
+                            <input type="number" id="price_grade_B" class="setting-input" style="width:100%;" onchange="saveSettings()">
+                            <span class="currencySymbolGrade" style="color: var(--accent-color); font-weight: bold; font-size: 14px; min-width: 18px;">€</span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:4px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px;">
+                            <span style="min-width:24px; font-weight: bold; color: #aaa;">C</span>
+                            <input type="number" id="price_grade_C" class="setting-input" style="width:100%;" onchange="saveSettings()">
+                            <span class="currencySymbolGrade" style="color: var(--accent-color); font-weight: bold; font-size: 14px; min-width: 18px;">€</span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:4px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px;">
+                            <span style="min-width:24px; font-weight: bold; color: #aaa;">D</span>
+                            <input type="number" id="price_grade_D" class="setting-input" style="width:100%;" onchange="saveSettings()">
+                            <span class="currencySymbolGrade" style="color: var(--accent-color); font-weight: bold; font-size: 14px; min-width: 18px;">€</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="setting-row">
+                <span class="setting-label" data-i18n="price_tax">税率</span>
+                <div style="display: flex; align-items: center; gap: 5px; width: 103px;">
+                    <input type="number" id="priceTax" class="setting-input" value="0" onchange="saveSettings()">
+                    <span style="color: var(--accent-color); font-weight: bold; font-size: 16px; min-width: 18px;">%</span>
+                </div>
+            </div>
+            <div class="setting-row">
+                <span class="setting-label" data-i18n="price_show_pdf">PDF显示价格</span>
+                <label class="switch"><input type="checkbox" id="priceShowPdf" onchange="saveSettings()"><span class="slider"></span></label>
+            </div>
+            <div class="setting-row">
+                <span class="setting-label" data-i18n="price_show_excel">Excel显示价格</span>
+                <label class="switch"><input type="checkbox" id="priceShowCsv" onchange="saveSettings()"><span class="slider"></span></label>
+            </div>
+        </div>
         <button class="btn-block" style="background:#333; color:#fff;" onclick="document.getElementById('settingsModal').style.display='none'" data-i18n="btn_close">关闭</button>
     </div>
 </div>
 
 <div id="historyPop" class="modal-overlay" onclick="this.style.display='none'"><div class="modal-card" onclick="event.stopPropagation()"><div class="modal-title" data-i18n="modal_history">历史记录</div><div id="historyList" style="max-height:300px; overflow-y:auto;"></div><button class="btn-block" style="background:#333; color:#fff;" onclick="document.getElementById('historyPop').style.display='none'" data-i18n="btn_close">关闭</button></div></div>
-<div id="exportModal" class="modal-overlay"><div class="modal-card"><div class="modal-title">Excel CSV Data</div><textarea id="exportText" class="export-text" rows="10" readonly></textarea><button class="btn-block" style="background:var(--accent-color); color:#000;" onclick="copyExportText()" data-i18n="btn_copy">复制全部</button><button class="btn-block" style="background:#444; color:#fff;" onclick="document.getElementById('exportModal').style.display='none'" data-i18n="btn_close">关闭</button></div></div>
 
 <script>
     let logs = [];
     let globalInfo = { container: '', note: '', seller: '', measurer: '', location: '', company: '' };
     let histories = { container: [], seller: [], measurer: [], location: [], company: [] };
-    let appSettings = { deductLen: 0, deductDia: 0, showGrade: true, calcDia: false, roundMode: 'up' };
+    let appSettings = { 
+        deductLen: 0, 
+        deductDia: 0, 
+        showGrade: true, 
+        calcDia: false, 
+        roundMode: 'up',
+        priceCurrency: 'EUR',
+        priceMode: 'fixed',
+        priceFixed: 0,
+        priceByGrade: { 'F': 0, 'A+': 0, 'A': 0, 'B': 0, 'C': 0, 'D': 0 },
+        taxPercent: 0,
+        showPricePdf: false,
+        showPriceCsv: false
+    };
     let nextRoundUp = true;
     const GRADES = ['F', 'A+', 'A', 'B', 'C', 'D'];
     let activeFilter = null;
@@ -321,9 +349,9 @@
     let isQuickMode = false;
 
     const I18N = {
-        zh: { btn_new: "⟳ 新柜", btn_info: "📋 信息", btn_pdf: "PDF", btn_excel: "导出", container: "集装箱号", note_global: "整单备注", seller: "卖方公司", measurer: "测量人", location: "地点", my_company: "公司名称", code: "码号", grade: "等级", len: "长(m)", dia: "径(cm)", vol: "体积", note: "备注", idx: "序", inputting: "● 正在输入", add_next: "+ 添加并下一根", total_count: "总数", total_vol: "材积", modal_info_title: "项目信息", modal_history: "历史记录", btn_close: "关闭", btn_copy: "复制内容", p_date: "日期", select_grade: "选择等级", quick_on: "⚡ 快速模式: 开", quick_off: "⚡ 快速模式: 关", settings_title: "设置", language: "语言 / Language", show_grade: "显示等级按钮", len_deduct: "长度扣减", dia_deduct: "直径扣减", deduction_desc: "自动扣减 (单位: 厘米)", calc_dia: "双径模式 (计算平均值)" },
-        en: { btn_new: "⟳ Reset", btn_info: "📋 Info", btn_pdf: "PDF", btn_excel: "Export", container: "Container", note_global: "Global Note", seller: "Seller", measurer: "Measurer", location: "Location", my_company: "Company", code: "Code", grade: "Grade", len: "L(m)", dia: "D(cm)", vol: "Vol", note: "Note", idx: "#", inputting: "● Inputting", add_next: "+ Add & Next", total_count: "Count", total_vol: "Volume", modal_info_title: "Project Info", modal_history: "History", btn_close: "Close", btn_copy: "Copy All", p_date: "Date", select_grade: "Select Grade", quick_on: "⚡ Quick Mode: ON", quick_off: "⚡ Quick Mode: OFF", settings_title: "Settings", language: "Language", show_grade: "Show Grades", len_deduct: "Len Deduct", dia_deduct: "Dia Deduct", deduction_desc: "Auto Deduction (Unit: cm)", calc_dia: "Dual Dia Mode (Average)" },
-        sl: { btn_new: "⟳ Nov", btn_info: "📋 Info", btn_pdf: "PDF", btn_excel: "Izvozi", container: "Kontejner", note_global: "Opomba", seller: "Prodajalec", measurer: "Merilec", location: "Lokacija", my_company: "Podjetje", code: "Št.", grade: "Razred", len: "D(m)", dia: "P(cm)", vol: "Vol", note: "Opomba", idx: "#", inputting: "● Vnos", add_next: "+ Dodaj", total_count: "Količina", total_vol: "Volumen", modal_info_title: "Podatki", modal_history: "Zgodovina", btn_close: "Zapri", btn_copy: "Kopiraj", p_date: "Datum", select_grade: "Izberi Razred", quick_on: "⚡ Hitro: ON", quick_off: "⚡ Hitro: OFF", settings_title: "Nastavitve", language: "Jezik", show_grade: "Prikaži Razrede", len_deduct: "Odbitek Dolžine", dia_deduct: "Odbitek Premera", deduction_desc: "Samodejni odbitek (cm)", calc_dia: "Dvojni premer (Povprečje)" }
+        zh: { btn_new: "⟳ 新柜", btn_info: "📋 信息", btn_settings: "⚙️ 设置", btn_pdf: "PDF", btn_excel: "导出 Excel", container: "集装箱号", note_global: "整单备注", seller: "卖方公司", measurer: "测量人", location: "地点", my_company: "公司名称", code: "码号", grade: "等级", len: "长(m)", dia: "径(cm)", vol: "体积", note: "备注", idx: "序", inputting: "● 正在输入", add_next: "+ 添加并下一根", total_count: "总数", total_vol: "材积", modal_info_title: "项目信息", modal_history: "历史记录", btn_close: "关闭", btn_copy: "复制内容", p_date: "日期", select_grade: "选择等级", quick_on: "⚡ 快速模式: 开", quick_off: "⚡ 快速模式: 关", quick_mode: "快速模式", settings_title: "设置", language: "语言 / Language", show_grade: "显示等级按钮", len_deduct: "长度扣减", dia_deduct: "直径扣减", deduction_desc: "自动扣减 (单位: 厘米)", calc_dia: "双径模式 (计算平均值)", price_title: "价格设置 (每立方米)", price_currency: "币种", price_mode: "定价方式", price_mode_fixed: "统一价", price_mode_grade: "按等级", price_fixed: "一口价 (每立方米)", price_by_grade: "按等级", price_tax: "税率", price_show_pdf: "PDF显示价格", price_show_excel: "Excel显示价格", price_unit: "单价", price_amount: "金额", price_total: "总金额" },
+        en: { btn_new: "⟳ Reset", btn_info: "📋 Info", btn_settings: "⚙️ Settings", btn_pdf: "PDF", btn_excel: "Export Excel", container: "Container", note_global: "Global Note", seller: "Seller", measurer: "Measurer", location: "Location", my_company: "Company", code: "Code", grade: "Grade", len: "L(m)", dia: "D(cm)", vol: "Vol", note: "Note", idx: "#", inputting: "● Inputting", add_next: "+ Add & Next", total_count: "Count", total_vol: "Volume", modal_info_title: "Project Info", modal_history: "History", btn_close: "Close", btn_copy: "Copy All", p_date: "Date", select_grade: "Select Grade", quick_on: "⚡ Quick Mode: ON", quick_off: "⚡ Quick Mode: OFF", quick_mode: "Quick Mode", settings_title: "Settings", language: "Language", show_grade: "Show Grades", len_deduct: "Len Deduct", dia_deduct: "Dia Deduct", deduction_desc: "Auto Deduction (Unit: cm)", calc_dia: "Dual Dia Mode (Average)", price_title: "Pricing (per m³)", price_currency: "Currency", price_mode: "Pricing Mode", price_mode_fixed: "Fixed Price", price_mode_grade: "By Grade", price_fixed: "Fixed Price (per m³)", price_by_grade: "By Grade", price_tax: "Tax", price_show_pdf: "Show price in PDF", price_show_excel: "Show price in Excel", price_unit: "Unit Price", price_amount: "Amount", price_total: "Total Amount" },
+        sl: { btn_new: "⟳ Nov", btn_info: "📋 Info", btn_settings: "⚙️ Nastavitve", btn_pdf: "PDF", btn_excel: "Izvozi Excel", container: "Kontejner", note_global: "Opomba", seller: "Prodajalec", measurer: "Merilec", location: "Lokacija", my_company: "Podjetje", code: "Št.", grade: "Razred", len: "D(m)", dia: "P(cm)", vol: "Vol", note: "Opomba", idx: "#", inputting: "● Vnos", add_next: "+ Dodaj", total_count: "Količina", total_vol: "Volumen", modal_info_title: "Podatki", modal_history: "Zgodovina", btn_close: "Zapri", btn_copy: "Kopiraj", p_date: "Datum", select_grade: "Izberi Razred", quick_on: "⚡ Hitro: ON", quick_off: "⚡ Hitro: OFF", quick_mode: "Hitri način", settings_title: "Nastavitve", language: "Jezik", show_grade: "Prikaži Razrede", len_deduct: "Odbitek Dolžine", dia_deduct: "Odbitek Premera", deduction_desc: "Samodejni odbitek (cm)", calc_dia: "Dvojni premer (Povprečje)", price_title: "Cene (na m³)", price_currency: "Valuta", price_mode: "Način cene", price_mode_fixed: "Enotna cena", price_mode_grade: "Po razredu", price_fixed: "Enotna cena (na m³)", price_by_grade: "Po razredu", price_tax: "Davek", price_show_pdf: "Cena v PDF", price_show_excel: "Cena v Excel", price_unit: "Cena", price_amount: "Znesek", price_total: "Skupni znesek" }
     };
 
     const STORAGE_KEY = 'oak_v286_data';
@@ -356,6 +384,9 @@
 
         const savedSet = localStorage.getItem(SETTINGS_KEY);
         if(savedSet) { appSettings = Object.assign(appSettings, JSON.parse(savedSet)); }
+
+        if(!appSettings.priceByGrade) appSettings.priceByGrade = {};
+        GRADES.forEach(g => { if(appSettings.priceByGrade[g] === undefined) appSettings.priceByGrade[g] = 0; });
         
         const savedMix = localStorage.getItem(MIX_STATE_KEY);
         if(savedMix) { nextRoundUp = (savedMix === 'true'); }
@@ -365,10 +396,24 @@
         document.getElementById('checkShowGrade').checked = appSettings.showGrade;
         document.getElementById('checkCalcDia').checked = appSettings.calcDia || false;
         document.getElementById('roundSelect').value = appSettings.roundMode || 'up';
+        document.getElementById('priceCurrency').value = appSettings.priceCurrency || 'EUR';
+        document.getElementById('priceMode').value = appSettings.priceMode || 'fixed';
+        document.getElementById('priceFixed').value = appSettings.priceFixed || 0;
+        document.getElementById('priceTax').value = appSettings.taxPercent || 0;
+        document.getElementById('priceShowPdf').checked = !!appSettings.showPricePdf;
+        document.getElementById('priceShowCsv').checked = !!appSettings.showPriceCsv;
+        document.getElementById('price_grade_F').value = appSettings.priceByGrade['F'] || 0;
+        document.getElementById('price_grade_Aplus').value = appSettings.priceByGrade['A+'] || 0;
+        document.getElementById('price_grade_A').value = appSettings.priceByGrade['A'] || 0;
+        document.getElementById('price_grade_B').value = appSettings.priceByGrade['B'] || 0;
+        document.getElementById('price_grade_C').value = appSettings.priceByGrade['C'] || 0;
+        document.getElementById('price_grade_D').value = appSettings.priceByGrade['D'] || 0;
 
         applyLanguage();
         updateQuickBtnUI();
         toggleCalcDia(); 
+        updatePriceModeUI();
+        updateCurrencySymbols();
         if(logs.length === 0) addNewLog();
         renderAll();
     };
@@ -384,6 +429,20 @@
         appSettings.deductLen = parseFloat(document.getElementById('setDeductLen').value) || 0;
         appSettings.deductDia = parseFloat(document.getElementById('setDeductDia').value) || 0;
         appSettings.roundMode = document.getElementById('roundSelect').value;
+        appSettings.priceCurrency = document.getElementById('priceCurrency').value;
+        appSettings.priceMode = document.getElementById('priceMode').value;
+        appSettings.priceFixed = parseFloat(document.getElementById('priceFixed').value) || 0;
+        appSettings.taxPercent = parseFloat(document.getElementById('priceTax').value) || 0;
+        appSettings.showPricePdf = document.getElementById('priceShowPdf').checked;
+        appSettings.showPriceCsv = document.getElementById('priceShowCsv').checked;
+        appSettings.priceByGrade = {
+            'F': parseFloat(document.getElementById('price_grade_F').value) || 0,
+            'A+': parseFloat(document.getElementById('price_grade_Aplus').value) || 0,
+            'A': parseFloat(document.getElementById('price_grade_A').value) || 0,
+            'B': parseFloat(document.getElementById('price_grade_B').value) || 0,
+            'C': parseFloat(document.getElementById('price_grade_C').value) || 0,
+            'D': parseFloat(document.getElementById('price_grade_D').value) || 0
+        };
         localStorage.setItem(SETTINGS_KEY, JSON.stringify(appSettings));
     }
     function toggleGradeDisplay() {
@@ -397,6 +456,14 @@
         saveSettings();
         renderAll();
     }
+
+    function updatePriceModeUI() {
+        const mode = document.getElementById('priceMode').value;
+        const fixedRow = document.getElementById('priceFixedRow');
+        const gradeBox = document.getElementById('priceGradeBox');
+        if(fixedRow) fixedRow.style.display = mode === 'fixed' ? 'flex' : 'none';
+        if(gradeBox) gradeBox.style.display = mode === 'grade' ? 'block' : 'none';
+    }
     
     function openSettingsModal() { document.getElementById('settingsModal').style.display='flex'; }
     function cleanInput(val) { if(!val) return ''; return val.replace(/,/g, '.').replace(/[^0-9.]/g, ''); }
@@ -409,6 +476,32 @@
             if(id && field) updateItem(parseInt(id), field, input.value);
         }
     }
+
+    function getCurrencySymbol() {
+        if(appSettings.priceCurrency === 'EUR') return '€';
+        if(appSettings.priceCurrency === 'USD') return '$';
+        if(appSettings.priceCurrency === 'CNY') return '¥';
+        return appSettings.priceCurrency || '';
+    }
+    function updateCurrencySymbols() {
+        const symbol = getCurrencySymbol();
+        const fixedSymbol = document.getElementById('currencySymbolFixed');
+        if(fixedSymbol) fixedSymbol.innerText = symbol;
+        document.querySelectorAll('.currencySymbolGrade').forEach(el => el.innerText = symbol);
+    }
+    function getUnitPriceForLog(log) {
+        if(appSettings.priceMode === 'grade') {
+            const p = appSettings.priceByGrade[log.grade];
+            return parseFloat(p) || 0;
+        }
+        return parseFloat(appSettings.priceFixed) || 0;
+    }
+    function calcLogAmountBeforeTax(log) {
+        const unit = getUnitPriceForLog(log);
+        const v = parseFloat(log.volume) || 0;
+        return unit * v;
+    }
+    function formatMoney(n) { return (isNaN(n) ? '' : n.toFixed(2)); }
 
     function toggleQuickMode() { isQuickMode = !isQuickMode; localStorage.setItem(QUICK_KEY, isQuickMode); updateQuickBtnUI(); }
     function updateQuickBtnUI() {
@@ -766,13 +859,6 @@
         html += mkTag('l25', '< 2.5m', l25);
         html += mkTag('d30', '< 30cm', d30);
         document.getElementById('statsDetail').innerHTML = html;
-
-        let summaryHtml = `<h3>${currentLang==='zh'?'统计汇总':(currentLang==='en'?'Summary':'Povzetek')}</h3>
-        <p>${I18N[currentLang].total_count}: ${validLogs.length} &nbsp; ${I18N[currentLang].total_vol}: ${totalV.toFixed(3)} m³</p>
-        <p>Grade: <br>`;
-        for(let g in gStats) if(g!=='?' && g!=='') summaryHtml += `<span style="margin-right:20px; display:inline-block;">${g}: <b>${gStats[g]}</b></span>`;
-        summaryHtml += `</p>`;
-        document.getElementById('printSummary').innerHTML = summaryHtml;
     }
 
     function toggleFilter(key) {
@@ -828,45 +914,575 @@
         }
     }
 
+    async function generatePDF() {
+        const { jsPDF } = window.jspdf;
+        
+        // 创建一个临时的隐藏容器来渲染PDF内容
+        const pdfContainer = document.createElement('div');
+        pdfContainer.style.cssText = 'position:absolute;left:-9999px;width:800px;background:white;padding:40px;';
+        document.body.appendChild(pdfContainer);
+        
+        const t = I18N[currentLang];
+        const d = new Date();
+        const dateStr = `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}`;
+        const timeStr = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}_${d.getHours()}-${d.getMinutes()}`;
+        
+        // 构建HTML内容
+        let html = `
+            <div style="font-family: Arial, sans-serif; color: #000;">
+                <h2 style="text-align:center; margin-bottom:20px; font-size:20px; border-bottom:2px solid #000; padding-bottom:10px;">
+                    PACKING LOG LIST / SHIPMENT
+                </h2>
+                <table style="width:100%; border-collapse:collapse; margin-bottom:20px; font-size:12px;">
+        `;
+        
+        // 项目信息（专业双列布局，自动排版，不出现空白格）
+        const infoItems = [];
+        const pushInfo = (label, value) => {
+            if(value === undefined || value === null) return;
+            const v = String(value).trim();
+            if(v === '') return;
+            infoItems.push([label, v]);
+        };
+        const companyValue = (globalInfo.company || '').trim();
+        infoItems.push([t.p_date, dateStr]);
+        pushInfo(t.container, globalInfo.container);
+        pushInfo(t.seller, globalInfo.seller);
+        pushInfo(t.location, globalInfo.location);
+        pushInfo(t.measurer, globalInfo.measurer);
+        pushInfo(t.note_global, globalInfo.note);
+
+        if (companyValue) {
+            html += `
+                <tr>
+                    <td style="border:0.6px solid #999; padding:8px; background:#f7f7f7; width:18%;"><strong>${t.my_company}</strong></td>
+                    <td style="border:0.6px solid #999; padding:8px;" colspan="3">${companyValue}</td>
+                </tr>
+            `;
+        }
+        for (let i = 0; i < infoItems.length; i += 2) {
+            const left = infoItems[i];
+            const right = infoItems[i + 1];
+            if (right) {
+                html += `
+                    <tr>
+                        <td style="border:0.6px solid #999; padding:8px; background:#f7f7f7; width:18%; font-weight:600;">${left[0]}</td>
+                        <td style="border:0.6px solid #999; padding:8px; width:32%;">${left[1]}</td>
+                        <td style="border:0.6px solid #999; padding:8px; background:#f7f7f7; width:18%; font-weight:600;">${right[0]}</td>
+                        <td style="border:0.6px solid #999; padding:8px; width:32%;">${right[1]}</td>
+                    </tr>
+                `;
+            } else {
+                html += `
+                    <tr>
+                        <td style="border:0.6px solid #999; padding:8px; background:#f7f7f7; width:18%; font-weight:600;">${left[0]}</td>
+                        <td style="border:0.6px solid #999; padding:8px;" colspan="3">${left[1]}</td>
+                    </tr>
+                `;
+            }
+        }
+        
+        html += `</table>`;
+        
+        // 原木数据表格（显示金额列）
+        const validLogs = logs.filter(l => parseFloat(l.volume) > 0);
+        const showPricePdf = !!appSettings.showPricePdf;
+        const currencySymbol = getCurrencySymbol();
+        const amountHeadHtml = showPricePdf 
+            ? `<th style="border:0.6px solid #999; padding:8px; text-align:center; font-weight:600;">${t.price_amount}</th>`
+            : '';
+        
+        html += `
+            <table style="width:100%; border-collapse:collapse; font-size:11px; margin-bottom:20px; color:#222;">
+                <thead>
+                    <tr style="background:#e9e9e9;">
+                        <th style="border:0.6px solid #999; padding:8px; text-align:center; font-weight:600;">${t.idx}</th>
+                        <th style="border:0.6px solid #999; padding:8px; text-align:center; font-weight:600;">${t.code}</th>
+                        <th style="border:0.6px solid #999; padding:8px; text-align:center; font-weight:600;">${t.grade}</th>
+                        <th style="border:0.6px solid #999; padding:8px; text-align:center; font-weight:600;">${t.len}</th>
+                        <th style="border:0.6px solid #999; padding:8px; text-align:center; font-weight:600;">${t.dia}</th>
+                        <th style="border:0.6px solid #999; padding:8px; text-align:center; font-weight:600;">${t.vol} (m³)</th>
+                        ${amountHeadHtml}
+                        <th style="border:0.6px solid #999; padding:8px; text-align:center; font-weight:600;">${t.note}</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+        
+        [...validLogs].reverse().forEach((log, index) => {
+            const len = parseFloat(cleanInput(log.length.toString())) || '';
+            const dia = parseFloat(cleanInput(log.diameter.toString())) || '';
+            const vol = log.volume ? log.volume.toFixed(3) : '0.000';
+            const bgColor = index % 2 === 0 ? '#f7f7f7' : '#ffffff';
+            const amount = calcLogAmountBeforeTax(log);
+            const amountCellHtml = showPricePdf 
+                ? `<td style="border:0.6px solid #999; padding:6px; text-align:center;">${amount ? formatMoney(amount) : ''}</td>`
+                : '';
+            
+            html += `
+                <tr style="background:${bgColor};">
+                    <td style="border:0.6px solid #999; padding:6px; text-align:center;">${index + 1}</td>
+                    <td style="border:0.6px solid #999; padding:6px; text-align:center;">${log.code || ''}</td>
+                    <td style="border:0.6px solid #999; padding:6px; text-align:center;">${log.grade || '-'}</td>
+                    <td style="border:0.6px solid #999; padding:6px; text-align:center;">${len}</td>
+                    <td style="border:0.6px solid #999; padding:6px; text-align:center;">${dia}</td>
+                    <td style="border:0.6px solid #999; padding:6px; text-align:center;">${vol}</td>
+                    ${amountCellHtml}
+                    <td style="border:0.6px solid #999; padding:6px; text-align:left; font-size:10px;">${log.note || ''}</td>
+                </tr>
+            `;
+        });
+        
+        html += `</tbody></table>`;
+        
+        // 统计汇总
+        const totalV = validLogs.reduce((s, l) => s + l.volume, 0);
+        const gStats = {};
+        let l4 = 0, l25 = 0, d30 = 0;
+        
+        validLogs.forEach(l => {
+            const g = l.grade || '?';
+            gStats[g] = (gStats[g] || 0) + 1;
+            const len_m = parseFloat(cleanInput(l.length.toString()));
+            const dia_cm = parseFloat(cleanInput(l.diameter.toString()));
+            if(len_m < 4.0) l4++;
+            if(len_m < 2.5) l25++;
+            if(dia_cm < 30) d30++;
+        });
+        
+        // 价格汇总 - 独立的6列表格
+        if(showPricePdf) {
+            const taxPercent = parseFloat(appSettings.taxPercent) || 0;
+            let totalBeforeTax = 0;
+            let avgUnitPrice = 0;
+            validLogs.forEach(l => {
+                const unit = getUnitPriceForLog(l);
+                const v = parseFloat(l.volume) || 0;
+                totalBeforeTax += unit * v;
+            });
+            if(totalV > 0) avgUnitPrice = totalBeforeTax / totalV;
+            
+            const taxAmount = taxPercent > 0 ? totalBeforeTax * (taxPercent / 100) : 0;
+            const totalAfterTax = totalBeforeTax + taxAmount;
+            
+            const skupajLabel = currentLang === 'sl' ? 'Skupaj' : (currentLang === 'zh' ? '总计' : 'Total');
+            const taxLabel = currentLang === 'sl' ? 'DDV' : (currentLang === 'zh' ? '增值税' : 'TAX');
+            const totalLabel = currentLang === 'sl' ? 'Bruto znesek' : (currentLang === 'zh' ? '含税总额' : 'Total with Tax');
+            
+            const gradeLabel = currentLang === 'sl' ? 'Razred' : (currentLang === 'zh' ? '等级' : 'Grade');
+            const kolicinaLabel = currentLang === 'sl' ? 'Količina' : (currentLang === 'zh' ? '数量' : 'Quantity');
+            const znesekLabel = currentLang === 'sl' ? 'Znesek' : (currentLang === 'zh' ? '金额' : 'Amount');
+            
+            // 计算每个等级的详细信息
+            const gradeDetails = {};
+            validLogs.forEach(l => {
+                const g = l.grade || '?';
+                if(g === '?' || g === '') return;
+                if(!gradeDetails[g]) {
+                    gradeDetails[g] = { count: 0, volume: 0, amount: 0 };
+                }
+                gradeDetails[g].count++;
+                gradeDetails[g].volume += parseFloat(l.volume) || 0;
+                const unitPrice = getUnitPriceForLog(l);
+                const v = parseFloat(l.volume) || 0;
+                gradeDetails[g].amount += unitPrice * v;
+            });
+            
+            // 判断是否按等级定价
+            const isByGrade = appSettings.priceMode === 'grade';
+            const totalLabel2 = currentLang === 'sl' ? 'Skupaj' : (currentLang === 'zh' ? '总计' : 'Total');
+            const unitPriceLabel = currentLang === 'sl' ? `Cena (${currencySymbol}/m³)` : (currentLang === 'zh' ? `单价 (${currencySymbol}/m³)` : `Unit Price (${currencySymbol}/m³)`);
+            
+            // 获取每个等级的单价
+            const gradeUnitPrices = {};
+            GRADES.forEach(g => {
+                if(appSettings.priceMode === 'grade') {
+                    gradeUnitPrices[g] = parseFloat(appSettings.priceByGrade[g]) || 0;
+                } else {
+                    gradeUnitPrices[g] = parseFloat(appSettings.priceFixed) || 0;
+                }
+            });
+            
+            html += `
+                <table style="width:100%; border-collapse:collapse; font-size:11px; margin-top:20px; color:#222;">
+                    <thead>
+                        <tr style="background:#e9e9e9;">
+                            <th style="border:0.6px solid #999; padding:8px; width:20%; text-align:center; font-weight:600;">${gradeLabel}</th>
+                            <th style="border:0.6px solid #999; padding:8px; width:20%; text-align:center; font-weight:600;">${kolicinaLabel}</th>
+                            <th style="border:0.6px solid #999; padding:8px; width:20%; text-align:center; font-weight:600;">m³</th>
+                            <th style="border:0.6px solid #999; padding:8px; width:20%; text-align:center; font-weight:600;">${unitPriceLabel}</th>
+                            <th style="border:0.6px solid #999; padding:8px; width:20%; text-align:center; font-weight:600;">${znesekLabel}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            // 如果按等级定价，先显示等级明细
+            if(isByGrade) {
+                GRADES.forEach(g => {
+                    if(gradeDetails[g]) {
+                        const detail = gradeDetails[g];
+                        const unitPrice = gradeUnitPrices[g] || 0;
+                        html += `
+                            <tr style="background:#f9f9f9;">
+                                <td style="border:0.6px solid #999; padding:8px; text-align:center; font-weight:bold;">${g}</td>
+                                <td style="border:0.6px solid #999; padding:8px; text-align:center;">${detail.count}</td>
+                                <td style="border:0.6px solid #999; padding:8px; text-align:center;">${detail.volume.toFixed(3)}</td>
+                                <td style="border:0.6px solid #999; padding:8px; text-align:center;">${formatMoney(unitPrice)}</td>
+                                <td style="border:0.6px solid #999; padding:8px; text-align:center;">${formatMoney(detail.amount)} ${currencySymbol}</td>
+                            </tr>
+                        `;
+                    }
+                });
+            }
+            
+            // 总计行
+            html += `
+                        <tr style="background:#f0f0f0; font-weight:bold; border-top:2px solid #666;">
+                            <td style="border:0.6px solid #999; padding:8px; text-align:center;">${totalLabel2}</td>
+                            <td style="border:0.6px solid #999; padding:8px; text-align:center;">${validLogs.length}</td>
+                            <td style="border:0.6px solid #999; padding:8px; text-align:center;">${totalV.toFixed(3)}</td>
+                            <td style="border:0.6px solid #999; padding:8px; text-align:center;">${formatMoney(avgUnitPrice)}</td>
+                            <td style="border:0.6px solid #999; padding:8px; text-align:center;">${formatMoney(totalBeforeTax)} ${currencySymbol}</td>
+                        </tr>
+            `;
+            if(taxPercent > 0) {
+                html += `
+                        <tr style="background:#f9f9f9;">
+                            <td style="border:0.6px solid #999; padding:8px;"></td>
+                            <td style="border:0.6px solid #999; padding:8px;"></td>
+                            <td style="border:0.6px solid #999; padding:8px;"></td>
+                            <td style="border:0.6px solid #999; padding:8px; text-align:right;">${taxLabel} ${taxPercent.toFixed(1)} %</td>
+                            <td style="border:0.6px solid #999; padding:8px; text-align:center;">${formatMoney(taxAmount)} ${currencySymbol}</td>
+                        </tr>
+                        <tr style="background:#f0f0f0; font-weight:bold;">
+                            <td style="border:0.6px solid #999; padding:8px;"></td>
+                            <td style="border:0.6px solid #999; padding:8px;"></td>
+                            <td style="border:0.6px solid #999; padding:8px;"></td>
+                            <td style="border:0.6px solid #999; padding:8px; text-align:right;">${totalLabel}</td>
+                            <td style="border:0.6px solid #999; padding:8px; text-align:center;">${formatMoney(totalAfterTax)} ${currencySymbol}</td>
+                        </tr>
+                `;
+            }
+            
+            // 如果不是按等级定价，在最后显示等级明细
+            if(!isByGrade) {
+                GRADES.forEach(g => {
+                    if(gradeDetails[g]) {
+                        const detail = gradeDetails[g];
+                        const unitPrice = gradeUnitPrices[g] || 0;
+                        html += `
+                            <tr style="background:#f9f9f9;">
+                                <td style="border:0.6px solid #999; padding:8px; text-align:center; font-weight:bold;">${g}</td>
+                                <td style="border:0.6px solid #999; padding:8px; text-align:center;">${detail.count}</td>
+                                <td style="border:0.6px solid #999; padding:8px; text-align:center;">${detail.volume.toFixed(3)}</td>
+                                <td style="border:0.6px solid #999; padding:8px; text-align:center;">${formatMoney(unitPrice)}</td>
+                                <td style="border:0.6px solid #999; padding:8px; text-align:center;">${formatMoney(detail.amount)} ${currencySymbol}</td>
+                            </tr>
+                        `;
+                    }
+                });
+            }
+            
+            html += `
+                    </tbody>
+                </table>
+            `;
+        }
+        
+        // 其他统计信息
+        const summaryTitle = currentLang==='zh'?'统计汇总':(currentLang==='en'?'SUMMARY':'POVZETEK');
+        html += `
+            <div style="background:#f0f0f0; padding:15px; border:2px solid #000; margin-top:20px;">
+                <h3 style="margin:0 0 10px 0; font-size:14px;">${summaryTitle}</h3>
+                <p style="margin:5px 0; font-size:12px;">
+                    <strong>${t.total_count}:</strong> ${validLogs.length} &nbsp;&nbsp;
+                    <strong>${t.total_vol}:</strong> <span style="font-weight:bold;">${totalV.toFixed(3)} m³</span>
+                </p>
+        `;
+        
+        if(Object.keys(gStats).length > 0) {
+            html += `<p style="margin:5px 0; font-size:11px;"><strong>Grade:</strong> `;
+            for(let g in gStats) {
+                if(g !== '?' && g !== '') {
+                    html += `${g}: ${gStats[g]} &nbsp;&nbsp; `;
+                }
+            }
+            html += `</p>`;
+        }
+        
+        if(l4 > 0 || l25 > 0 || d30 > 0) {
+            html += `<p style="margin:5px 0; font-size:10px; color:#666;">`;
+            if(l4 > 0) html += `&lt; 4m: ${l4} &nbsp;&nbsp; `;
+            if(l25 > 0) html += `&lt; 2.5m: ${l25} &nbsp;&nbsp; `;
+            if(d30 > 0) html += `&lt; 30cm: ${d30}`;
+            html += `</p>`;
+        }
+        
+        html += `
+                <p style="margin:10px 0 0 0; font-size:9px; color:#999; border-top:1px solid #ccc; padding-top:10px;">
+                    Oak Master Gold v28.6 | ${dateStr}
+                </p>
+            </div>
+        `;
+        
+        pdfContainer.innerHTML = html;
+        
+        // 使用html2canvas转换为图片
+        try {
+            // 动态加载html2canvas
+            if (!window.html2canvas) {
+                await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+            }
+            
+            const canvas = await html2canvas(pdfContainer, {
+                scale: 2,
+                useCORS: true,
+                logging: false,
+                backgroundColor: '#ffffff'
+            });
+            
+            const imgData = canvas.toDataURL('image/png');
+            const doc = new jsPDF('p', 'mm', 'a4');
+            
+            const imgWidth = 210; // A4宽度
+            const pageHeight = 297; // A4高度
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            let heightLeft = imgHeight;
+            let position = 0;
+            
+            doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+            
+            while (heightLeft >= 0) {
+                position = heightLeft - imgHeight;
+                doc.addPage();
+                doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+            }
+            
+            const fileName = `OakLog_${globalInfo.container || 'Export'}_${timeStr}.pdf`;
+            doc.save(fileName);
+            
+        } catch (error) {
+            console.error('PDF generation error:', error);
+            alert('PDF generation failed. Please try again.');
+        } finally {
+            document.body.removeChild(pdfContainer);
+        }
+    }
+    
+    // 辅助函数：动态加载脚本
+    function loadScript(src) {
+        return new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = src;
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+        });
+    }
+
     async function exportData() {
         const d = new Date();
         const timeStr = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}_${d.getHours()}-${d.getMinutes()}`;
         const ds = d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
         const t = I18N[currentLang];
-        let header = `\ufeff${t.p_date},${ds}\n`;
-        if(globalInfo.company) header += `${t.my_company},${globalInfo.company}\n`;
-        if(globalInfo.container) header += `${t.container},${globalInfo.container}\n`;
-        if(globalInfo.note) header += `${t.note_global},${globalInfo.note}\n`;
-        if(globalInfo.seller) header += `${t.seller},${globalInfo.seller}\n`;
-        if(globalInfo.measurer) header += `${t.measurer},${globalInfo.measurer}\n`;
-        if(globalInfo.location) header += `${t.location},${globalInfo.location}\n`;
-        let csv = header + `\n${t.idx},${t.code},${t.grade},${t.len},${t.dia},${t.vol},${t.note}\n`;
+        const showPriceCsv = !!appSettings.showPriceCsv;
+        const currencySymbol = getCurrencySymbol();
+        const taxPercent = parseFloat(appSettings.taxPercent) || 0;
+        
+        const wb = XLSX.utils.book_new();
+        const wsData = [];
+        
+        // 项目信息 - 横向专业布局
+        const infoRow1 = [t.p_date, ds];
+        if(globalInfo.company) { infoRow1.push(t.my_company, globalInfo.company); }
+        wsData.push(infoRow1);
+        
+        const infoRow2 = [];
+        if(globalInfo.container) { infoRow2.push(t.container, globalInfo.container); }
+        if(globalInfo.seller) { infoRow2.push(t.seller, globalInfo.seller); }
+        if(infoRow2.length > 0) wsData.push(infoRow2);
+        
+        const infoRow3 = [];
+        if(globalInfo.location) { infoRow3.push(t.location, globalInfo.location); }
+        if(globalInfo.measurer) { infoRow3.push(t.measurer, globalInfo.measurer); }
+        if(infoRow3.length > 0) wsData.push(infoRow3);
+        
+        if(globalInfo.note) wsData.push([t.note_global, globalInfo.note]);
+        
+        wsData.push([]);
+        
+        // 表头（包含金额列）
+        const headerRow = [t.idx, t.code, t.grade, t.len, t.dia, t.vol];
+        if(showPriceCsv) {
+            headerRow.push(t.price_amount);
+        }
+        headerRow.push(t.note);
+        wsData.push(headerRow);
+        
+        // 数据行
         const validLogs = logs.filter(l => parseFloat(l.volume) > 0);
+        let totalBeforeTax = 0;
         [...validLogs].reverse().forEach((l, idx) => {
-            let len = l.length.toString().replace(/,/g, '.');
-            let dia = l.diameter.toString().replace(/,/g, '.');
-            csv += `${idx+1},${l.code},${l.grade},${len},${dia},${l.volume.toFixed(3)},${l.note||''}\n`;
+            const len = parseFloat(cleanInput(l.length.toString())) || '';
+            const dia = parseFloat(cleanInput(l.diameter.toString())) || '';
+            const vol = l.volume ? parseFloat(l.volume.toFixed(3)) : 0;
+            
+            const dataRow = [idx + 1, l.code || '', l.grade || '-', len, dia, vol];
+            
+            // 添加金额列
+            if(showPriceCsv) {
+                const amount = calcLogAmountBeforeTax(l);
+                totalBeforeTax += amount;
+                dataRow.push(amount ? parseFloat(amount.toFixed(2)) : '');
+            }
+            
+            dataRow.push(l.note || '');
+            wsData.push(dataRow);
         });
+        
+        // 统计汇总 - 独立的6列表格
+        wsData.push([]);
         const totalV = validLogs.reduce((s, l) => s + l.volume, 0);
+        
+        if(showPriceCsv && totalBeforeTax > 0) {
+            let avgUnitPrice = totalV > 0 ? totalBeforeTax / totalV : 0;
+            const taxAmount = taxPercent > 0 ? totalBeforeTax * (taxPercent / 100) : 0;
+            const totalAfterTax = totalBeforeTax + taxAmount;
+            
+            const gradeLabel = currentLang === 'sl' ? 'Razred' : (currentLang === 'zh' ? '等级' : 'Grade');
+            const kolicinaLabel = currentLang === 'sl' ? 'Količina' : (currentLang === 'zh' ? '数量' : 'Quantity');
+            const znesekLabel = currentLang === 'sl' ? 'Znesek' : (currentLang === 'zh' ? '金额' : 'Amount');
+            const taxLabel = currentLang === 'sl' ? 'DDV' : (currentLang === 'zh' ? '增值税' : 'TAX');
+            const totalLabel = currentLang === 'sl' ? 'Bruto znesek' : (currentLang === 'zh' ? '含税总额' : 'Total with Tax');
+            
+            // 计算每个等级的详细信息
+            const gradeDetails = {};
+            validLogs.forEach(l => {
+                const g = l.grade || '?';
+                if(g === '?' || g === '') return;
+                if(!gradeDetails[g]) {
+                    gradeDetails[g] = { count: 0, volume: 0, amount: 0 };
+                }
+                gradeDetails[g].count++;
+                gradeDetails[g].volume += parseFloat(l.volume) || 0;
+                const unitPrice = getUnitPriceForLog(l);
+                const v = parseFloat(l.volume) || 0;
+                gradeDetails[g].amount += unitPrice * v;
+            });
+            
+            // 判断是否按等级定价
+            const isByGrade = appSettings.priceMode === 'grade';
+            const totalLabel2 = currentLang === 'sl' ? 'Skupaj' : (currentLang === 'zh' ? '总计' : 'Total');
+            
+            // 获取每个等级的单价
+            const gradeUnitPrices = {};
+            GRADES.forEach(g => {
+                if(appSettings.priceMode === 'grade') {
+                    gradeUnitPrices[g] = parseFloat(appSettings.priceByGrade[g]) || 0;
+                } else {
+                    gradeUnitPrices[g] = parseFloat(appSettings.priceFixed) || 0;
+                }
+            });
+            
+            // 5列表格：等级 | 数量 | m³ | 单价(€/m³) | 金额
+            // 表头行
+            wsData.push([]);
+            const unitPriceLabel = currentLang === 'sl' ? `Cena (${currencySymbol}/m³)` : (currentLang === 'zh' ? `单价 (${currencySymbol}/m³)` : `Unit Price (${currencySymbol}/m³)`);
+            const headerRow = [gradeLabel, kolicinaLabel, 'm³', unitPriceLabel, znesekLabel];
+            wsData.push(headerRow);
+            
+            // 如果按等级定价，先显示等级明细
+            if(isByGrade) {
+                GRADES.forEach(g => {
+                    if(gradeDetails[g]) {
+                        const detail = gradeDetails[g];
+                        const unitPrice = gradeUnitPrices[g] || 0;
+                        wsData.push([
+                            g,
+                            detail.count,
+                            parseFloat(detail.volume.toFixed(3)),
+                            parseFloat(formatMoney(unitPrice)),
+                            `${formatMoney(detail.amount)} ${currencySymbol}`
+                        ]);
+                    }
+                });
+            }
+            
+            // 总计行
+            const row1 = [
+                totalLabel2,
+                validLogs.length,
+                parseFloat(totalV.toFixed(3)),
+                parseFloat(formatMoney(avgUnitPrice)),
+                `${formatMoney(totalBeforeTax)} ${currencySymbol}`
+            ];
+            wsData.push(row1);
+            
+            // 如果有税收
+            if(taxPercent > 0) {
+                // 税额行
+                const row2 = ['', '', '', `${taxLabel} ${taxPercent.toFixed(1)} %`, `${formatMoney(taxAmount)} ${currencySymbol}`];
+                wsData.push(row2);
+                
+                // 含税总额行
+                const row3 = ['', '', '', totalLabel, `${formatMoney(totalAfterTax)} ${currencySymbol}`];
+                wsData.push(row3);
+            }
+            
+            // 如果不是按等级定价，在最后显示等级明细
+            if(!isByGrade) {
+                GRADES.forEach(g => {
+                    if(gradeDetails[g]) {
+                        const detail = gradeDetails[g];
+                        const unitPrice = gradeUnitPrices[g] || 0;
+                        wsData.push([
+                            g,
+                            detail.count,
+                            parseFloat(detail.volume.toFixed(3)),
+                            parseFloat(formatMoney(unitPrice)),
+                            `${formatMoney(detail.amount)} ${currencySymbol}`
+                        ]);
+                    }
+                });
+            }
+        } else {
+            // 不显示价格时的简单汇总
+            wsData.push([t.total_count, validLogs.length, '', t.total_vol, totalV.toFixed(3) + ' m³']);
+        }
+        
+        // 其他统计
         let l4 = 0, l25 = 0, d30 = 0;
         validLogs.forEach(l => {
-            const len_m = parseFloat(l.length.toString().replace(/,/g, '.'));
-            const dia_cm = parseFloat(l.diameter.toString().replace(/,/g, '.'));
+            const len_m = parseFloat(cleanInput(l.length.toString()));
+            const dia_cm = parseFloat(cleanInput(l.diameter.toString()));
             if(len_m < 4.0) l4++; if(len_m < 2.5) l25++; if(dia_cm < 30) d30++;
         });
-        csv += `\n\n=== ${currentLang==='zh'?'统计':'Summary'} ===\n`;
-        csv += `${t.total_count},${validLogs.length}\n${t.total_vol},${totalV.toFixed(3)}\n`;
-        csv += `\n< 4m,${l4}\n< 2.5m,${l25}\n< 30cm,${d30}\n\n`;
-        const gStats = {}; validLogs.forEach(l => { gStats[l.grade] = (gStats[l.grade] || 0) + 1; });
-        for(let g in gStats) if(g!=='?' && g!=='') csv += `${g},${gStats[g]}\n`;
-        const fileName = `Oak_${timeStr}.csv`;
-        if (navigator.share) {
-            try { await navigator.share({ files: [new File([csv], fileName, {type: 'text/csv'})], title: 'Export' }); return; } catch (e) {}
+        
+        wsData.push([]);
+        if(l4 > 0) wsData.push(['< 4m', l4]);
+        if(l25 > 0) wsData.push(['< 2.5m', l25]);
+        if(d30 > 0) wsData.push(['< 30cm', d30]);
+        
+        const ws = XLSX.utils.aoa_to_sheet(wsData);
+        
+        // 设置列宽
+        const colWidths = [
+            { wch: 6 }, { wch: 16 }, { wch: 8 }, { wch: 10 }, { wch: 10 }, { wch: 12 }
+        ];
+        if(showPriceCsv) {
+            colWidths.push({ wch: 16 }, { wch: 16 });
         }
-        document.getElementById('exportText').value = csv;
-        document.getElementById('exportModal').style.display = 'flex';
+        colWidths.push({ wch: 25 });
+        ws['!cols'] = colWidths;
+        
+        XLSX.utils.book_append_sheet(wb, ws, 'Oak Logs');
+        
+        const fileName = `OakLog_${globalInfo.container || 'Export'}_${timeStr}.xlsx`;
+        XLSX.writeFile(wb, fileName);
     }
-    function copyExportText() { document.getElementById('exportText').select(); document.execCommand('copy'); alert('Copied'); document.getElementById('exportModal').style.display='none'; }
 
     function saveToHistory(t){const v=document.getElementById('g_'+t).value.trim();if(v&&!histories[t].includes(v)){histories[t].push(v);localStorage.setItem(HIST_KEY,JSON.stringify(histories));alert('Saved');}}
     function showHistory(t){
