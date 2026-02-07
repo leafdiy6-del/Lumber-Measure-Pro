@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -150,6 +149,66 @@ text-align: left !important; padding-left: 25px !important; }
     .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
     input:checked + .slider { background-color: var(--accent-color); }
     input:checked + .slider:before { transform: translateX(16px); }
+
+    :root { --pro-kb-height: 350px; }
+    body.pro-kb-enabled { padding-bottom: calc(var(--pro-kb-height) + env(safe-area-inset-bottom)); }
+    body.pro-kb-enabled .log-card { display: none; }
+
+    .pro-kb { 
+        position: fixed; 
+        left: 0; 
+        right: 0; 
+        bottom: 0; 
+        height: var(--pro-kb-height); 
+        background: #151515; 
+        border-top: 2px solid var(--accent-color); 
+        z-index: 130; 
+        display: none; 
+        box-shadow: 0 -6px 20px rgba(0,0,0,0.6);
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+    body.pro-kb-enabled .pro-kb { display: block; }
+    .pro-kb-top { display: grid; gap: 8px; padding: 10px; background: #1b1b1b; border-bottom: 1px solid #2a2a2a; }
+    .pro-kb-top.three { grid-template-columns: repeat(3, 1fr); }
+    .pro-kb-top.four { grid-template-columns: repeat(4, 1fr); }
+    .kb-field { background: #1f1f1f; border: 1px solid #333; border-radius: 6px; padding: 6px 8px; cursor: pointer; }
+    .kb-field-label { font-size: 10px; color: #777; text-transform: uppercase; letter-spacing: 0.5px; }
+    .kb-field-value { font-size: 18px; font-weight: bold; color: #fff; min-height: 20px; }
+    .kb-field.active { border-color: var(--gold-highlight); box-shadow: 0 0 8px rgba(255,215,0,0.6); }
+
+    .pro-kb-note { display: none; padding: 6px 10px; border-bottom: 1px solid #2a2a2a; background: #181818; }
+    .pro-kb-note.visible { display: flex; justify-content: space-between; align-items: center; }
+    .pro-kb-note-label { color: #777; font-size: 10px; text-transform: uppercase; letter-spacing: 0.4px; }
+    .pro-kb-note-value { color: #ddd; font-size: 13px; max-width: 75%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .pro-kb-note.active { border-bottom: 1px solid var(--gold-highlight); }
+
+    .pro-kb-body { display: grid; grid-template-columns: 1.1fr 3fr 1.1fr; gap: 8px; padding: 10px; height: calc(var(--pro-kb-height) - 80px); }
+    .kb-side { display: grid; grid-template-rows: repeat(4, 1fr); gap: 8px; }
+    .kb-side-btn { background: #1f1f1f; border: 1px solid #333; color: #c9c1b8; border-radius: 8px; font-weight: bold; font-size: 12px; letter-spacing: 0.5px; }
+    .kb-side-btn.active { border-color: var(--gold-highlight); color: #fff; box-shadow: 0 0 8px rgba(255,215,0,0.4); }
+    .kb-side-btn.disabled { opacity: 0.4; pointer-events: none; }
+
+    .kb-core { display: grid; }
+    .kb-num-grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(4, 1fr); gap: 8px; height: 100%; }
+    .kb-grade-grid { display: none; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); gap: 8px; height: 100%; }
+    .kb-core.grade-mode .kb-num-grid { display: none; }
+    .kb-core.grade-mode .kb-grade-grid { display: grid; }
+
+    .kb-key { background: #202020; border: 1px solid #333; color: #eee; border-radius: 10px; font-size: 18px; font-weight: bold; }
+    .kb-key.gold { border-color: var(--accent-color); color: #000; background: var(--accent-color); }
+    .kb-key.small { font-size: 14px; }
+    .kb-grade-key.active { background: var(--accent-color); color: #000; border-color: var(--accent-color); }
+
+    .kb-ops { display: grid; grid-template-rows: 1fr 3fr; gap: 8px; }
+    .kb-del { background: #2a2a2a; border: 1px solid #444; color: #eee; font-weight: bold; border-radius: 10px; }
+    .kb-ok { background: var(--accent-color); color: #000; font-size: 22px; font-weight: bold; border: none; border-radius: 12px; }
+
+    .pro-kb button:active { transform: scale(0.96); filter: brightness(1.1); }
+
+    .price-settings-box { margin-top: 10px; }
+    .price-grade-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 100%; }
+    .price-grade-item { display:flex; align-items:center; gap:6px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; min-width: 0; }
+    .price-grade-item input { min-width: 0; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
@@ -170,6 +229,43 @@ text-align: left !important; padding-left: 25px !important; }
 </header>
 
 <div id="logList"></div>
+
+<div id="proKeyboard" class="pro-kb">
+    <div id="proKbTop" class="pro-kb-top three"></div>
+    <div id="proKbNote" class="pro-kb-note" onclick="setProActiveField('note')">
+        <span class="pro-kb-note-label" data-i18n="note">备注</span>
+        <span class="pro-kb-note-value" id="proNoteValue"></span>
+    </div>
+    <div class="pro-kb-body">
+        <div class="kb-side">
+            <button class="kb-side-btn" id="kbSideLen" onclick="handleProSide('len')" data-i18n="kb_len_btn">LEN/长度</button>
+            <button class="kb-side-btn" id="kbSideDia" onclick="handleProSide('dia')" data-i18n="kb_dia_btn">DIA/直径</button>
+            <button class="kb-side-btn" id="kbSideGrd" onclick="handleProSide('grd')" data-i18n="kb_grd_btn">GRD/等级</button>
+            <button class="kb-side-btn" id="kbSideNote" onclick="handleProSide('note')" data-i18n="kb_note_btn">NOTE/备注</button>
+        </div>
+        <div class="kb-core" id="kbCore">
+            <div class="kb-num-grid">
+                <button class="kb-key" onclick="handleProKey('7')">7</button>
+                <button class="kb-key" onclick="handleProKey('8')">8</button>
+                <button class="kb-key" onclick="handleProKey('9')">9</button>
+                <button class="kb-key" onclick="handleProKey('4')">4</button>
+                <button class="kb-key" onclick="handleProKey('5')">5</button>
+                <button class="kb-key" onclick="handleProKey('6')">6</button>
+                <button class="kb-key" onclick="handleProKey('1')">1</button>
+                <button class="kb-key" onclick="handleProKey('2')">2</button>
+                <button class="kb-key" onclick="handleProKey('3')">3</button>
+                <button class="kb-key" onclick="handleProKey('0')">0</button>
+                <button class="kb-key" onclick="handleProKey('.')">.</button>
+                <button class="kb-key small" onclick="handleProNext()" data-i18n="kb_next">NXT</button>
+            </div>
+            <div class="kb-grade-grid" id="proKbGrade"></div>
+        </div>
+        <div class="kb-ops">
+            <button class="kb-del" onclick="handleProDelete()" data-i18n="kb_del">DEL</button>
+            <button class="kb-ok" onclick="handleProOk()" data-i18n="kb_ok">OK</button>
+        </div>
+    </div>
+</div>
 
 <div class="footer">
     <div class="stats-detail" id="statsDetail"></div>
@@ -214,6 +310,10 @@ text-align: left !important; padding-left: 25px !important; }
                 <button id="quickModeBtn" class="toggle-btn" onclick="toggleQuickMode()">⚡</button>
             </div>
             <div class="setting-row">
+                <span class="setting-label" data-i18n="enable_pro_kb">启用专业虚拟键盘</span>
+                <label class="switch"><input type="checkbox" id="checkProKeyboard" onchange="toggleProKeyboard()"><span class="slider"></span></label>
+            </div>
+            <div class="setting-row">
                 <span class="setting-label"><span data-i18n="show_grade">显示等级</span></span>
                 <label class="switch"><input type="checkbox" id="checkShowGrade" checked onchange="toggleGradeDisplay()"><span class="slider"></span></label>
             </div>
@@ -244,78 +344,84 @@ text-align: left !important; padding-left: 25px !important; }
         <div class="setting-group">
             <div style="font-size:12px; color:#aaa; margin-bottom:10px;" data-i18n="price_title">价格设置 (每立方米)</div>
             <div class="setting-row">
-                <span class="setting-label" data-i18n="price_currency">币种</span>
-                <select id="priceCurrency" onchange="updateCurrencySymbols(); saveSettings()" style="width:100px; height:30px; font-size:12px;">
-                    <option value="EUR">EUR €</option>
-                    <option value="USD">USD $</option>
-                    <option value="CNY">CNY ¥</option>
-                </select>
+                <span class="setting-label" data-i18n="price_enable">启用价格计算</span>
+                <label class="switch"><input type="checkbox" id="priceEnabled" onchange="togglePriceEnabled()"><span class="slider"></span></label>
             </div>
-            <div class="setting-row">
-                <span class="setting-label" data-i18n="price_mode">定价方式</span>
-                <select id="priceMode" onchange="updatePriceModeUI(); saveSettings()" style="width:120px; height:30px; font-size:12px;">
-                    <option value="fixed" data-i18n="price_mode_fixed">统一价</option>
-                    <option value="grade" data-i18n="price_mode_grade">按等级</option>
-                </select>
-            </div>
-            <div class="setting-row" id="priceFixedRow">
-                <span class="setting-label" data-i18n="price_fixed">一口价 (每立方米)</span>
-                <div style="display: flex; align-items: center; gap: 5px; width: 103px;">
-                    <input type="number" id="priceFixed" class="setting-input" value="0" onchange="saveSettings()">
-                    <span id="currencySymbolFixed" style="color: var(--accent-color); font-weight: bold; font-size: 16px; min-width: 18px;">€</span>
+            <div id="priceSettingsBox" class="price-settings-box">
+                <div class="setting-row">
+                    <span class="setting-label" data-i18n="price_currency">币种</span>
+                    <select id="priceCurrency" onchange="updateCurrencySymbols(); saveSettings()" style="width:100px; height:30px; font-size:12px;">
+                        <option value="EUR">EUR €</option>
+                        <option value="USD">USD $</option>
+                        <option value="CNY">CNY ¥</option>
+                    </select>
                 </div>
-            </div>
-            <div id="priceGradeBox" style="display:none;">
-                <div class="setting-row" style="align-items:flex-start;">
-                    <span class="setting-label" data-i18n="price_by_grade">按等级</span>
-                    <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:15px; width:100%;">
-                        <div style="display:flex; align-items:center; gap:4px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px;">
-                            <span style="min-width:24px; font-weight: bold; color: #aaa;">F</span>
-                            <input type="number" id="price_grade_F" class="setting-input" style="width:100%;" onchange="saveSettings()">
-                            <span class="currencySymbolGrade" style="color: var(--accent-color); font-weight: bold; font-size: 14px; min-width: 18px;">€</span>
-                        </div>
-                        <div style="display:flex; align-items:center; gap:4px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px;">
-                            <span style="min-width:24px; font-weight: bold; color: #aaa;">A+</span>
-                            <input type="number" id="price_grade_Aplus" class="setting-input" style="width:100%;" onchange="saveSettings()">
-                            <span class="currencySymbolGrade" style="color: var(--accent-color); font-weight: bold; font-size: 14px; min-width: 18px;">€</span>
-                        </div>
-                        <div style="display:flex; align-items:center; gap:4px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px;">
-                            <span style="min-width:24px; font-weight: bold; color: #aaa;">A</span>
-                            <input type="number" id="price_grade_A" class="setting-input" style="width:100%;" onchange="saveSettings()">
-                            <span class="currencySymbolGrade" style="color: var(--accent-color); font-weight: bold; font-size: 14px; min-width: 18px;">€</span>
-                        </div>
-                        <div style="display:flex; align-items:center; gap:4px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px;">
-                            <span style="min-width:24px; font-weight: bold; color: #aaa;">B</span>
-                            <input type="number" id="price_grade_B" class="setting-input" style="width:100%;" onchange="saveSettings()">
-                            <span class="currencySymbolGrade" style="color: var(--accent-color); font-weight: bold; font-size: 14px; min-width: 18px;">€</span>
-                        </div>
-                        <div style="display:flex; align-items:center; gap:4px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px;">
-                            <span style="min-width:24px; font-weight: bold; color: #aaa;">C</span>
-                            <input type="number" id="price_grade_C" class="setting-input" style="width:100%;" onchange="saveSettings()">
-                            <span class="currencySymbolGrade" style="color: var(--accent-color); font-weight: bold; font-size: 14px; min-width: 18px;">€</span>
-                        </div>
-                        <div style="display:flex; align-items:center; gap:4px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px;">
-                            <span style="min-width:24px; font-weight: bold; color: #aaa;">D</span>
-                            <input type="number" id="price_grade_D" class="setting-input" style="width:100%;" onchange="saveSettings()">
-                            <span class="currencySymbolGrade" style="color: var(--accent-color); font-weight: bold; font-size: 14px; min-width: 18px;">€</span>
+                <div class="setting-row">
+                    <span class="setting-label" data-i18n="price_mode">定价方式</span>
+                    <select id="priceMode" onchange="updatePriceModeUI(); saveSettings()" style="width:120px; height:30px; font-size:12px;">
+                        <option value="fixed" data-i18n="price_mode_fixed">统一价</option>
+                        <option value="grade" data-i18n="price_mode_grade">按等级</option>
+                    </select>
+                </div>
+                <div class="setting-row" id="priceFixedRow">
+                    <span class="setting-label" data-i18n="price_fixed">一口价 (每立方米)</span>
+                    <div style="display: flex; align-items: center; gap: 5px; width: 103px;">
+                        <input type="number" id="priceFixed" class="setting-input" value="0" onchange="saveSettings()">
+                        <span id="currencySymbolFixed" style="color: var(--accent-color); font-weight: bold; font-size: 16px; min-width: 18px;">€</span>
+                    </div>
+                </div>
+                <div id="priceGradeBox" style="display:none;">
+                    <div class="setting-row" style="align-items:flex-start;">
+                        <span class="setting-label" data-i18n="price_by_grade">按等级</span>
+                        <div class="price-grade-grid">
+                            <div class="price-grade-item">
+                                <span style="min-width:24px; font-weight: bold; color: #aaa;">F</span>
+                                <input type="number" id="price_grade_F" class="setting-input" style="width:100%;" onchange="saveSettings()">
+                                <span class="currencySymbolGrade" style="color: var(--accent-color); font-weight: bold; font-size: 14px; min-width: 18px;">€</span>
+                            </div>
+                            <div class="price-grade-item">
+                                <span style="min-width:24px; font-weight: bold; color: #aaa;">A+</span>
+                                <input type="number" id="price_grade_Aplus" class="setting-input" style="width:100%;" onchange="saveSettings()">
+                                <span class="currencySymbolGrade" style="color: var(--accent-color); font-weight: bold; font-size: 14px; min-width: 18px;">€</span>
+                            </div>
+                            <div class="price-grade-item">
+                                <span style="min-width:24px; font-weight: bold; color: #aaa;">A</span>
+                                <input type="number" id="price_grade_A" class="setting-input" style="width:100%;" onchange="saveSettings()">
+                                <span class="currencySymbolGrade" style="color: var(--accent-color); font-weight: bold; font-size: 14px; min-width: 18px;">€</span>
+                            </div>
+                            <div class="price-grade-item">
+                                <span style="min-width:24px; font-weight: bold; color: #aaa;">B</span>
+                                <input type="number" id="price_grade_B" class="setting-input" style="width:100%;" onchange="saveSettings()">
+                                <span class="currencySymbolGrade" style="color: var(--accent-color); font-weight: bold; font-size: 14px; min-width: 18px;">€</span>
+                            </div>
+                            <div class="price-grade-item">
+                                <span style="min-width:24px; font-weight: bold; color: #aaa;">C</span>
+                                <input type="number" id="price_grade_C" class="setting-input" style="width:100%;" onchange="saveSettings()">
+                                <span class="currencySymbolGrade" style="color: var(--accent-color); font-weight: bold; font-size: 14px; min-width: 18px;">€</span>
+                            </div>
+                            <div class="price-grade-item">
+                                <span style="min-width:24px; font-weight: bold; color: #aaa;">D</span>
+                                <input type="number" id="price_grade_D" class="setting-input" style="width:100%;" onchange="saveSettings()">
+                                <span class="currencySymbolGrade" style="color: var(--accent-color); font-weight: bold; font-size: 14px; min-width: 18px;">€</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="setting-row">
-                <span class="setting-label" data-i18n="price_tax">税率</span>
-                <div style="display: flex; align-items: center; gap: 5px; width: 103px;">
-                    <input type="number" id="priceTax" class="setting-input" value="0" onchange="saveSettings()">
-                    <span style="color: var(--accent-color); font-weight: bold; font-size: 16px; min-width: 18px;">%</span>
+                <div class="setting-row">
+                    <span class="setting-label" data-i18n="price_tax">税率</span>
+                    <div style="display: flex; align-items: center; gap: 5px; width: 103px;">
+                        <input type="number" id="priceTax" class="setting-input" value="0" onchange="saveSettings()">
+                        <span style="color: var(--accent-color); font-weight: bold; font-size: 16px; min-width: 18px;">%</span>
+                    </div>
                 </div>
-            </div>
-            <div class="setting-row">
-                <span class="setting-label" data-i18n="price_show_pdf">PDF显示价格</span>
-                <label class="switch"><input type="checkbox" id="priceShowPdf" onchange="saveSettings()"><span class="slider"></span></label>
-            </div>
-            <div class="setting-row">
-                <span class="setting-label" data-i18n="price_show_excel">Excel显示价格</span>
-                <label class="switch"><input type="checkbox" id="priceShowCsv" onchange="saveSettings()"><span class="slider"></span></label>
+                <div class="setting-row">
+                    <span class="setting-label" data-i18n="price_show_pdf">PDF显示价格</span>
+                    <label class="switch"><input type="checkbox" id="priceShowPdf" onchange="saveSettings()"><span class="slider"></span></label>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label" data-i18n="price_show_excel">Excel显示价格</span>
+                    <label class="switch"><input type="checkbox" id="priceShowCsv" onchange="saveSettings()"><span class="slider"></span></label>
+                </div>
             </div>
         </div>
         <button class="btn-block" style="background:#333; color:#fff;" onclick="document.getElementById('settingsModal').style.display='none'" data-i18n="btn_close">关闭</button>
@@ -334,6 +440,8 @@ text-align: left !important; padding-left: 25px !important; }
         showGrade: true, 
         calcDia: false, 
         roundMode: 'up',
+        proKeyboard: false,
+        priceEnabled: false,
         priceCurrency: 'EUR',
         priceMode: 'fixed',
         priceFixed: 0,
@@ -347,11 +455,16 @@ text-align: left !important; padding-left: 25px !important; }
     let activeFilter = null;
     let currentLang = 'zh';
     let isQuickMode = false;
+    let proState = {
+        activeField: 'length',
+        keypadMode: 'num',
+        values: { code: '', length: '', dia: '', dia1: '', dia2: '', note: '' }
+    };
 
     const I18N = {
-        zh: { btn_new: "⟳ 新柜", btn_info: "📋 信息", btn_settings: "⚙️ 设置", btn_pdf: "PDF", btn_excel: "导出 Excel", container: "集装箱号", note_global: "整单备注", seller: "卖方公司", measurer: "测量人", location: "地点", my_company: "公司名称", code: "码号", grade: "等级", len: "长(m)", dia: "径(cm)", vol: "体积", note: "备注", idx: "序", inputting: "● 正在输入", add_next: "+ 添加并下一根", total_count: "总数", total_vol: "材积", modal_info_title: "项目信息", modal_history: "历史记录", btn_close: "关闭", btn_copy: "复制内容", p_date: "日期", select_grade: "选择等级", quick_on: "⚡ 快速模式: 开", quick_off: "⚡ 快速模式: 关", quick_mode: "快速模式", settings_title: "设置", language: "语言 / Language", show_grade: "显示等级按钮", len_deduct: "长度扣减", dia_deduct: "直径扣减", deduction_desc: "自动扣减 (单位: 厘米)", calc_dia: "双径模式 (计算平均值)", price_title: "价格设置 (每立方米)", price_currency: "币种", price_mode: "定价方式", price_mode_fixed: "统一价", price_mode_grade: "按等级", price_fixed: "一口价 (每立方米)", price_by_grade: "按等级", price_tax: "税率", price_show_pdf: "PDF显示价格", price_show_excel: "Excel显示价格", price_unit: "单价", price_amount: "金额", price_total: "总金额" },
-        en: { btn_new: "⟳ Reset", btn_info: "📋 Info", btn_settings: "⚙️ Settings", btn_pdf: "PDF", btn_excel: "Export Excel", container: "Container", note_global: "Global Note", seller: "Seller", measurer: "Measurer", location: "Location", my_company: "Company", code: "Code", grade: "Grade", len: "L(m)", dia: "D(cm)", vol: "Vol", note: "Note", idx: "#", inputting: "● Inputting", add_next: "+ Add & Next", total_count: "Count", total_vol: "Volume", modal_info_title: "Project Info", modal_history: "History", btn_close: "Close", btn_copy: "Copy All", p_date: "Date", select_grade: "Select Grade", quick_on: "⚡ Quick Mode: ON", quick_off: "⚡ Quick Mode: OFF", quick_mode: "Quick Mode", settings_title: "Settings", language: "Language", show_grade: "Show Grades", len_deduct: "Len Deduct", dia_deduct: "Dia Deduct", deduction_desc: "Auto Deduction (Unit: cm)", calc_dia: "Dual Dia Mode (Average)", price_title: "Pricing (per m³)", price_currency: "Currency", price_mode: "Pricing Mode", price_mode_fixed: "Fixed Price", price_mode_grade: "By Grade", price_fixed: "Fixed Price (per m³)", price_by_grade: "By Grade", price_tax: "Tax", price_show_pdf: "Show price in PDF", price_show_excel: "Show price in Excel", price_unit: "Unit Price", price_amount: "Amount", price_total: "Total Amount" },
-        sl: { btn_new: "⟳ Nov", btn_info: "📋 Info", btn_settings: "⚙️ Nastavitve", btn_pdf: "PDF", btn_excel: "Izvozi Excel", container: "Kontejner", note_global: "Opomba", seller: "Prodajalec", measurer: "Merilec", location: "Lokacija", my_company: "Podjetje", code: "Št.", grade: "Razred", len: "D(m)", dia: "P(cm)", vol: "Vol", note: "Opomba", idx: "#", inputting: "● Vnos", add_next: "+ Dodaj", total_count: "Količina", total_vol: "Volumen", modal_info_title: "Podatki", modal_history: "Zgodovina", btn_close: "Zapri", btn_copy: "Kopiraj", p_date: "Datum", select_grade: "Izberi Razred", quick_on: "⚡ Hitro: ON", quick_off: "⚡ Hitro: OFF", quick_mode: "Hitri način", settings_title: "Nastavitve", language: "Jezik", show_grade: "Prikaži Razrede", len_deduct: "Odbitek Dolžine", dia_deduct: "Odbitek Premera", deduction_desc: "Samodejni odbitek (cm)", calc_dia: "Dvojni premer (Povprečje)", price_title: "Cene (na m³)", price_currency: "Valuta", price_mode: "Način cene", price_mode_fixed: "Enotna cena", price_mode_grade: "Po razredu", price_fixed: "Enotna cena (na m³)", price_by_grade: "Po razredu", price_tax: "Davek", price_show_pdf: "Cena v PDF", price_show_excel: "Cena v Excel", price_unit: "Cena", price_amount: "Znesek", price_total: "Skupni znesek" }
+        zh: { btn_new: "⟳ 新柜", btn_info: "📋 信息", btn_settings: "⚙️ 设置", btn_pdf: "PDF", btn_excel: "导出 Excel", container: "集装箱号", note_global: "整单备注", seller: "卖方公司", measurer: "测量人", location: "地点", my_company: "公司名称", code: "码号", grade: "等级", len: "长(m)", dia: "径(cm)", vol: "体积", note: "备注", idx: "序", inputting: "● 正在输入", add_next: "+ 添加并下一根", total_count: "总数", total_vol: "材积", modal_info_title: "项目信息", modal_history: "历史记录", btn_close: "关闭", btn_copy: "复制内容", p_date: "日期", select_grade: "选择等级", quick_on: "⚡ 快速模式: 开", quick_off: "⚡ 快速模式: 关", quick_mode: "快速模式", settings_title: "设置", language: "语言 / Language", show_grade: "显示等级按钮", enable_pro_kb: "启用专业虚拟键盘", len_deduct: "长度扣减", dia_deduct: "直径扣减", deduction_desc: "自动扣减 (单位: 厘米)", calc_dia: "双径模式 (计算平均值)", price_title: "价格设置 (每立方米)", price_enable: "启用价格计算", price_currency: "币种", price_mode: "定价方式", price_mode_fixed: "统一价", price_mode_grade: "按等级", price_fixed: "一口价 (每立方米)", price_by_grade: "按等级", price_tax: "税率", price_show_pdf: "PDF显示价格", price_show_excel: "Excel显示价格", price_unit: "单价", price_amount: "金额", price_total: "总金额", kb_len_btn: "LEN/长度", kb_dia_btn: "DIA/直径", kb_grd_btn: "GRD/等级", kb_note_btn: "NOTE/备注", kb_del: "DEL", kb_ok: "OK", kb_next: "NXT", kb_code: "码号", kb_len: "长度", kb_dia: "直径", kb_dia1: "直径1", kb_dia2: "直径2" },
+        en: { btn_new: "⟳ Reset", btn_info: "📋 Info", btn_settings: "⚙️ Settings", btn_pdf: "PDF", btn_excel: "Export Excel", container: "Container", note_global: "Global Note", seller: "Seller", measurer: "Measurer", location: "Location", my_company: "Company", code: "Code", grade: "Grade", len: "L(m)", dia: "D(cm)", vol: "Vol", note: "Note", idx: "#", inputting: "● Inputting", add_next: "+ Add & Next", total_count: "Count", total_vol: "Volume", modal_info_title: "Project Info", modal_history: "History", btn_close: "Close", btn_copy: "Copy All", p_date: "Date", select_grade: "Select Grade", quick_on: "⚡ Quick Mode: ON", quick_off: "⚡ Quick Mode: OFF", quick_mode: "Quick Mode", settings_title: "Settings", language: "Language", show_grade: "Show Grades", enable_pro_kb: "Enable Pro Virtual Keyboard", len_deduct: "Len Deduct", dia_deduct: "Dia Deduct", deduction_desc: "Auto Deduction (Unit: cm)", calc_dia: "Dual Dia Mode (Average)", price_title: "Pricing (per m³)", price_enable: "Enable Price Calculation", price_currency: "Currency", price_mode: "Pricing Mode", price_mode_fixed: "Fixed Price", price_mode_grade: "By Grade", price_fixed: "Fixed Price (per m³)", price_by_grade: "By Grade", price_tax: "Tax", price_show_pdf: "Show price in PDF", price_show_excel: "Show price in Excel", price_unit: "Unit Price", price_amount: "Amount", price_total: "Total Amount", kb_len_btn: "LEN", kb_dia_btn: "DIA", kb_grd_btn: "GRD", kb_note_btn: "NOTE", kb_del: "DEL", kb_ok: "OK", kb_next: "NXT", kb_code: "Code", kb_len: "Length", kb_dia: "Dia", kb_dia1: "Dia1", kb_dia2: "Dia2" },
+        sl: { btn_new: "⟳ Nov", btn_info: "📋 Info", btn_settings: "⚙️ Nastavitve", btn_pdf: "PDF", btn_excel: "Izvozi Excel", container: "Kontejner", note_global: "Opomba", seller: "Prodajalec", measurer: "Merilec", location: "Lokacija", my_company: "Podjetje", code: "Št.", grade: "Razred", len: "D(m)", dia: "P(cm)", vol: "Vol", note: "Opomba", idx: "#", inputting: "● Vnos", add_next: "+ Dodaj", total_count: "Količina", total_vol: "Volumen", modal_info_title: "Podatki", modal_history: "Zgodovina", btn_close: "Zapri", btn_copy: "Kopiraj", p_date: "Datum", select_grade: "Izberi Razred", quick_on: "⚡ Hitro: ON", quick_off: "⚡ Hitro: OFF", quick_mode: "Hitri način", settings_title: "Nastavitve", language: "Jezik", show_grade: "Prikaži Razrede", enable_pro_kb: "Profesionalna tipkovnica", len_deduct: "Odbitek Dolžine", dia_deduct: "Odbitek Premera", deduction_desc: "Samodejni odbitek (cm)", calc_dia: "Dvojni premer (Povprečje)", price_title: "Cene (na m³)", price_enable: "Vklopi izračun cene", price_currency: "Valuta", price_mode: "Način cene", price_mode_fixed: "Enotna cena", price_mode_grade: "Po razredu", price_fixed: "Enotna cena (na m³)", price_by_grade: "Po razredu", price_tax: "Davek", price_show_pdf: "Cena v PDF", price_show_excel: "Cena v Excel", price_unit: "Cena", price_amount: "Znesek", price_total: "Skupni znesek", kb_len_btn: "LEN/DOL", kb_dia_btn: "DIA/PRE", kb_grd_btn: "GRD", kb_note_btn: "OPOMBA", kb_del: "DEL", kb_ok: "OK", kb_next: "NXT", kb_code: "Št.", kb_len: "Dolžina", kb_dia: "Premer", kb_dia1: "Premer1", kb_dia2: "Premer2" }
     };
 
     const STORAGE_KEY = 'oak_v286_data';
@@ -387,6 +500,12 @@ text-align: left !important; padding-left: 25px !important; }
 
         if(!appSettings.priceByGrade) appSettings.priceByGrade = {};
         GRADES.forEach(g => { if(appSettings.priceByGrade[g] === undefined) appSettings.priceByGrade[g] = 0; });
+        if(appSettings.priceEnabled === undefined) {
+            const hasPrice = (parseFloat(appSettings.priceFixed) || 0) > 0 ||
+                (parseFloat(appSettings.taxPercent) || 0) > 0 ||
+                GRADES.some(g => (parseFloat(appSettings.priceByGrade[g]) || 0) > 0);
+            appSettings.priceEnabled = hasPrice;
+        }
         
         const savedMix = localStorage.getItem(MIX_STATE_KEY);
         if(savedMix) { nextRoundUp = (savedMix === 'true'); }
@@ -395,6 +514,8 @@ text-align: left !important; padding-left: 25px !important; }
         document.getElementById('setDeductDia').value = appSettings.deductDia || 0;
         document.getElementById('checkShowGrade').checked = appSettings.showGrade;
         document.getElementById('checkCalcDia').checked = appSettings.calcDia || false;
+        document.getElementById('checkProKeyboard').checked = !!appSettings.proKeyboard;
+        document.getElementById('priceEnabled').checked = !!appSettings.priceEnabled;
         document.getElementById('roundSelect').value = appSettings.roundMode || 'up';
         document.getElementById('priceCurrency').value = appSettings.priceCurrency || 'EUR';
         document.getElementById('priceMode').value = appSettings.priceMode || 'fixed';
@@ -413,7 +534,9 @@ text-align: left !important; padding-left: 25px !important; }
         updateQuickBtnUI();
         toggleCalcDia(); 
         updatePriceModeUI();
+        updatePriceEnabledUI();
         updateCurrencySymbols();
+        applyProKeyboardUI();
         if(logs.length === 0) addNewLog();
         renderAll();
     };
@@ -422,6 +545,9 @@ text-align: left !important; padding-left: 25px !important; }
     function applyLanguage() {
         const texts = I18N[currentLang];
         document.querySelectorAll('[data-i18n]').forEach(el => { const key = el.getAttribute('data-i18n'); if(texts[key]) el.innerText = texts[key]; });
+        renderProKeyboardTopBar();
+        updateProNoteBar();
+        renderProGradePanel();
     }
     function updateGlobal() { ['container', 'note', 'seller', 'measurer', 'location', 'company'].forEach(k => { globalInfo[k] = document.getElementById('g_'+k).value; }); save(); }
     function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify({ logs, global: globalInfo })); updateStats(); }
@@ -429,6 +555,8 @@ text-align: left !important; padding-left: 25px !important; }
         appSettings.deductLen = parseFloat(document.getElementById('setDeductLen').value) || 0;
         appSettings.deductDia = parseFloat(document.getElementById('setDeductDia').value) || 0;
         appSettings.roundMode = document.getElementById('roundSelect').value;
+        appSettings.proKeyboard = document.getElementById('checkProKeyboard').checked;
+        appSettings.priceEnabled = document.getElementById('priceEnabled').checked;
         appSettings.priceCurrency = document.getElementById('priceCurrency').value;
         appSettings.priceMode = document.getElementById('priceMode').value;
         appSettings.priceFixed = parseFloat(document.getElementById('priceFixed').value) || 0;
@@ -449,12 +577,26 @@ text-align: left !important; padding-left: 25px !important; }
         appSettings.showGrade = document.getElementById('checkShowGrade').checked;
         saveSettings();
         renderAll();
+        updateProSideState();
+        if(!appSettings.showGrade && proState.keypadMode === 'grade') setProKeypadMode('num');
+    }
+    function toggleProKeyboard() {
+        appSettings.proKeyboard = document.getElementById('checkProKeyboard').checked;
+        saveSettings();
+        applyProKeyboardUI();
+        renderAll();
     }
     function toggleCalcDia() {
         appSettings.calcDia = document.getElementById('checkCalcDia').checked;
         document.getElementById('roundModeRow').style.display = appSettings.calcDia ? 'flex' : 'none';
         saveSettings();
         renderAll();
+        if(appSettings.proKeyboard) {
+            proState.values.dia1 = '';
+            proState.values.dia2 = '';
+        }
+        renderProKeyboardTopBar();
+        updateProSideState();
     }
 
     function updatePriceModeUI() {
@@ -464,6 +606,12 @@ text-align: left !important; padding-left: 25px !important; }
         if(fixedRow) fixedRow.style.display = mode === 'fixed' ? 'flex' : 'none';
         if(gradeBox) gradeBox.style.display = mode === 'grade' ? 'block' : 'none';
     }
+    function updatePriceEnabledUI() {
+        const enabled = document.getElementById('priceEnabled').checked;
+        const box = document.getElementById('priceSettingsBox');
+        if(box) box.style.display = enabled ? 'block' : 'none';
+    }
+    function togglePriceEnabled() { saveSettings(); updatePriceEnabledUI(); }
     
     function openSettingsModal() { document.getElementById('settingsModal').style.display='flex'; }
     function cleanInput(val) { if(!val) return ''; return val.replace(/,/g, '.').replace(/[^0-9.]/g, ''); }
@@ -509,6 +657,224 @@ text-align: left !important; padding-left: 25px !important; }
         const t = I18N[currentLang];
         if(isQuickMode) { btn.classList.add('active'); btn.innerText = t.quick_on; }
         else { btn.classList.remove('active'); btn.innerText = t.quick_off; }
+    }
+
+    function getActiveLog() { return logs.length > 0 ? logs[0] : null; }
+    function applyProKeyboardUI() {
+        document.body.classList.toggle('pro-kb-enabled', !!appSettings.proKeyboard);
+        if(appSettings.proKeyboard) {
+            renderProKeyboardTopBar();
+            syncProStateFromLog();
+            updateProNoteBar();
+            updateProSideState();
+            setProKeypadMode('num');
+            setProActiveField(proState.activeField || 'length');
+        }
+    }
+    function renderProKeyboardTopBar() {
+        const top = document.getElementById('proKbTop');
+        if(!top) return;
+        const t = I18N[currentLang];
+        const fields = appSettings.calcDia
+            ? [
+                { key: 'code', label: t.kb_code },
+                { key: 'length', label: t.kb_len },
+                { key: 'dia1', label: t.kb_dia1 },
+                { key: 'dia2', label: t.kb_dia2 }
+            ]
+            : [
+                { key: 'code', label: t.kb_code },
+                { key: 'length', label: t.kb_len },
+                { key: 'dia', label: t.kb_dia }
+            ];
+        top.className = `pro-kb-top ${appSettings.calcDia ? 'four' : 'three'}`;
+        top.innerHTML = fields.map(f => `
+            <div class="kb-field" data-field="${f.key}" onclick="setProActiveField('${f.key}')">
+                <div class="kb-field-label">${f.label}</div>
+                <div class="kb-field-value" id="kbv-${f.key}"></div>
+            </div>
+        `).join('');
+        if(!fields.some(f => f.key === proState.activeField)) {
+            proState.activeField = 'length';
+        }
+        updateProTopBarValues();
+        updateProActiveUI();
+    }
+    function syncProStateFromLog() {
+        const log = getActiveLog();
+        if(!log) return;
+        proState.values.code = log.code || '';
+        proState.values.length = log.length || '';
+        proState.values.dia = log.diameter || '';
+        proState.values.note = log.note || '';
+        updateProTopBarValues();
+        updateProNoteBar();
+        renderProGradePanel();
+    }
+    function updateProTopBarValues() {
+        const map = {
+            code: proState.values.code,
+            length: proState.values.length,
+            dia: proState.values.dia,
+            dia1: proState.values.dia1,
+            dia2: proState.values.dia2
+        };
+        Object.keys(map).forEach(k => {
+            const el = document.getElementById('kbv-' + k);
+            if(el) el.innerText = map[k] || '';
+        });
+    }
+    function updateProNoteBar() {
+        const bar = document.getElementById('proKbNote');
+        const val = document.getElementById('proNoteValue');
+        if(!bar || !val) return;
+        val.innerText = proState.values.note || '';
+        const show = proState.activeField === 'note' || (proState.values.note && proState.values.note.trim() !== '');
+        bar.classList.toggle('visible', !!show);
+        bar.classList.toggle('active', proState.activeField === 'note');
+    }
+    function updateProSideState() {
+        const grdBtn = document.getElementById('kbSideGrd');
+        if(grdBtn) grdBtn.classList.toggle('disabled', !appSettings.showGrade);
+    }
+    function normalizeProField(field) {
+        const valid = ['code', 'length', 'dia', 'dia1', 'dia2', 'note'];
+        if(!valid.includes(field)) field = 'length';
+        if(appSettings.calcDia) {
+            if(field === 'dia') field = 'dia1';
+        } else {
+            if(field === 'dia1' || field === 'dia2') field = 'dia';
+        }
+        return field;
+    }
+    function setProActiveField(field) {
+        proState.activeField = normalizeProField(field);
+        updateProActiveUI();
+        updateProNoteBar();
+    }
+    function updateProActiveUI() {
+        document.querySelectorAll('.kb-field').forEach(f => f.classList.remove('active'));
+        const activeField = document.querySelector(`.kb-field[data-field="${proState.activeField}"]`);
+        if(activeField) activeField.classList.add('active');
+        const lenBtn = document.getElementById('kbSideLen');
+        const diaBtn = document.getElementById('kbSideDia');
+        const noteBtn = document.getElementById('kbSideNote');
+        if(lenBtn) lenBtn.classList.toggle('active', proState.activeField === 'length');
+        if(diaBtn) diaBtn.classList.toggle('active', ['dia', 'dia1', 'dia2'].includes(proState.activeField));
+        if(noteBtn) noteBtn.classList.toggle('active', proState.activeField === 'note');
+    }
+    function setProKeypadMode(mode) {
+        proState.keypadMode = mode;
+        const core = document.getElementById('kbCore');
+        if(core) core.classList.toggle('grade-mode', mode === 'grade');
+        const grdBtn = document.getElementById('kbSideGrd');
+        if(grdBtn) grdBtn.classList.toggle('active', mode === 'grade');
+        if(mode === 'grade') renderProGradePanel();
+    }
+    function handleProSide(type) {
+        if(type === 'len') { setProActiveField('length'); setProKeypadMode('num'); return; }
+        if(type === 'dia') { setProActiveField(appSettings.calcDia ? 'dia1' : 'dia'); setProKeypadMode('num'); return; }
+        if(type === 'grd') { if(appSettings.showGrade) setProKeypadMode('grade'); return; }
+        if(type === 'note') { setProActiveField('note'); setProKeypadMode('num'); return; }
+    }
+    function updateProFieldValue(field, value) {
+        const log = getActiveLog();
+        if(!log) return;
+        proState.values[field] = value;
+        if(field === 'code') updateItem(log.id, 'code', value);
+        if(field === 'length') updateItem(log.id, 'length', value);
+        if(field === 'dia') updateItem(log.id, 'diameter', value);
+        if(field === 'note') updateItem(log.id, 'note', value);
+        updateProTopBarValues();
+        updateProNoteBar();
+    }
+    function handleProKey(ch) {
+        const field = proState.activeField;
+        if(!field) return;
+        if(field === 'code' && ch === '.') return;
+        if(['length', 'dia', 'dia1', 'dia2'].includes(field) && ch === '.' && (proState.values[field] || '').includes('.')) return;
+        const current = proState.values[field] || '';
+        const next = current + ch;
+        updateProFieldValue(field, next);
+        if(['dia1', 'dia2'].includes(field) && appSettings.calcDia) updateProDualVolume();
+        handleProQuickFlow(field);
+    }
+    function handleProDelete() {
+        const field = proState.activeField;
+        if(!field) return;
+        const current = proState.values[field] || '';
+        const next = current.slice(0, -1);
+        updateProFieldValue(field, next);
+        if(['dia1', 'dia2'].includes(field) && appSettings.calcDia) updateProDualVolume();
+    }
+    function handleProNext() {
+        const field = proState.activeField;
+        if(field === 'code') return setProActiveField('length');
+        if(field === 'length') return setProActiveField(appSettings.calcDia ? 'dia1' : 'dia');
+        if(field === 'dia1') return setProActiveField('dia2');
+        if(field === 'dia' || field === 'dia2') return handleProOk();
+        if(field === 'note') return setProActiveField('length');
+    }
+    function handleProOk() { addNewLog(); }
+    function handleProQuickFlow(field) {
+        if(!isQuickMode) return;
+        if(field === 'length') {
+            const val = proState.values.length || '';
+            if(!/^\d+$/.test(val)) return;
+            if(val.length === 2 && val[0] !== '1') {
+                updateProFieldValue('length', `${val[0]}.${val[1]}`);
+                handleProNext();
+                return;
+            }
+            if(val.length === 3 && val[0] === '1') {
+                updateProFieldValue('length', `${val.slice(0,2)}.${val[2]}`);
+                handleProNext();
+            }
+            return;
+        }
+        if(!['dia', 'dia1', 'dia2'].includes(field)) return;
+        const val = proState.values[field] || '';
+        if(!/^\d+$/.test(val)) return;
+        const shouldJump = (val[0] !== '1' && val.length === 2) || (val[0] === '1' && val.length === 3);
+        if(!shouldJump) return;
+        if(field === 'dia1') return setProActiveField('dia2');
+        if(appSettings.showGrade) return setProKeypadMode('grade');
+        handleProNext();
+    }
+    function updateProDualVolume() {
+        const log = getActiveLog();
+        if(!log) return;
+        const l = parseFloat(cleanInput(log.length.toString())) || 0;
+        const d1 = parseFloat(cleanInput((proState.values.dia1 || '').toString())) || 0;
+        const d2 = parseFloat(cleanInput((proState.values.dia2 || '').toString())) || 0;
+        let usedDia = 0;
+        if(d1 > 0 && d2 > 0) usedDia = (d1 + d2) / 2;
+        else if(d1 > 0) usedDia = d1;
+        if(l > 0 && usedDia > 0) {
+            const radius_m = usedDia / 200;
+            log.volume = parseFloat((Math.PI * Math.pow(radius_m, 2) * l).toFixed(3));
+            const vDisplay = document.getElementById('v-'+log.id); if(vDisplay) vDisplay.innerText = log.volume.toFixed(3);
+        } else {
+            log.volume = 0;
+            const vDisplay = document.getElementById('v-'+log.id); if(vDisplay) vDisplay.innerText = '0.000';
+        }
+        save();
+    }
+    function renderProGradePanel() {
+        const box = document.getElementById('proKbGrade');
+        if(!box) return;
+        const log = getActiveLog();
+        const activeGrade = log ? log.grade : '';
+        box.innerHTML = GRADES.map(g => `
+            <button class="kb-key kb-grade-key ${activeGrade===g?'active':''}" onclick="selectProGrade('${g}')">${g}</button>
+        `).join('');
+    }
+    function selectProGrade(grade) {
+        const log = getActiveLog();
+        if(!log) return;
+        setGrade(log.id, grade);
+        setProKeypadMode('num');
+        renderProGradePanel();
     }
     
     function handleQuickLength(input) {
@@ -619,8 +985,9 @@ text-align: left !important; padding-left: 25px !important; }
             const current = logs[0];
             
             if(appSettings.calcDia) {
-                const d1 = parseFloat(document.getElementById('in-dia-1').value) || 0;
-                const d2 = parseFloat(document.getElementById('in-dia-2').value) || 0;
+                const usePro = appSettings.proKeyboard;
+                const d1 = usePro ? (parseFloat(cleanInput((proState.values.dia1 || '').toString())) || 0) : (parseFloat(document.getElementById('in-dia-1')?.value) || 0);
+                const d2 = usePro ? (parseFloat(cleanInput((proState.values.dia2 || '').toString())) || 0) : (parseFloat(document.getElementById('in-dia-2')?.value) || 0);
                 if(d1 > 0 && d2 > 0) {
                     const finalDia = calculateDualDia(d1, d2);
                     current.diameter = finalDia.toString();
@@ -661,8 +1028,18 @@ text-align: left !important; padding-left: 25px !important; }
         applyFilter();
         
         setTimeout(() => {
-            const lenInput = document.querySelector(`.log-card .field input[data-field="length"]`);
-            if(lenInput) { lenInput.focus(); lenInput.click(); }
+            if(appSettings.proKeyboard) {
+                proState.values.length = '';
+                proState.values.dia = '';
+                proState.values.dia1 = '';
+                proState.values.dia2 = '';
+                syncProStateFromLog();
+                setProKeypadMode('num');
+                setProActiveField('length');
+            } else {
+                const lenInput = document.querySelector(`.log-card .field input[data-field="length"]`);
+                if(lenInput) { lenInput.focus(); lenInput.click(); }
+            }
         }, 10);
     }
 
@@ -682,6 +1059,7 @@ text-align: left !important; padding-left: 25px !important; }
             else container.appendChild(createRow(log, realIndex));
         });
         updateStats();
+        if(appSettings.proKeyboard) syncProStateFromLog();
         applyFilter();
     }
 
@@ -770,11 +1148,14 @@ text-align: left !important; padding-left: 25px !important; }
         if (isQuickMode) { 
             addNewLog();
             setTimeout(() => {
-                const lenInput = document.querySelector(`.log-card .field input[data-field="length"]`);
-                if(lenInput) lenInput.focus(); 
+                if(!appSettings.proKeyboard) {
+                    const lenInput = document.querySelector(`.log-card .field input[data-field="length"]`);
+                    if(lenInput) lenInput.focus(); 
+                }
             }, 0);
         } 
         else { renderAll(); }
+        if(appSettings.proKeyboard) renderProGradePanel();
     }
 
     function updateItem(id, field, val) {
@@ -802,14 +1183,16 @@ text-align: left !important; padding-left: 25px !important; }
         }
         
         if(appSettings.calcDia && id === logs[0].id) {
-             const d1 = parseFloat(document.getElementById('in-dia-1').value) || 0;
-             const d2 = parseFloat(document.getElementById('in-dia-2').value) || 0;
+             const usePro = appSettings.proKeyboard;
+             const d1 = usePro ? (parseFloat(cleanInput((proState.values.dia1 || '').toString())) || 0) : (parseFloat(document.getElementById('in-dia-1')?.value) || 0);
+             const d2 = usePro ? (parseFloat(cleanInput((proState.values.dia2 || '').toString())) || 0) : (parseFloat(document.getElementById('in-dia-2')?.value) || 0);
              if(d1 > 0 && d2 > 0) {
                  const avg = (d1 + d2) / 2;
                  const l = parseFloat(item.length) || 0;
                  if(l > 0) {
                      const r = avg / 200;
                      const v = (Math.PI * Math.pow(r, 2) * l).toFixed(3);
+                     item.volume = parseFloat(v);
                      document.getElementById('v-'+id).innerText = v;
                  }
              }
