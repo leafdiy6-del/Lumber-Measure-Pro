@@ -1,5 +1,5 @@
 // 1. 定义版本号：每次修改图标或代码后，手动把这个数字加 1
-const cacheName = 'lumber-v33';
+const cacheName = 'lumber-v35';
 
 // 2. 离线缓存清单：必须包含所有核心文件，特别是 icon.png
 const assets = [
